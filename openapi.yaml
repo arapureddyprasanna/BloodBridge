@@ -1,0 +1,1542 @@
+openapi: 3.0.3
+info:
+  title: BloodBridge API
+  version: 1.0.0
+  description: API contract for the BloodBridge blood donation coordination platform.
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local Django development server
+
+tags:
+  - name: Authentication
+  - name: Profiles
+  - name: Admin
+  - name: Hospitals
+  - name: Communities
+  - name: Donors
+  - name: Blood Requests
+  - name: Matching
+  - name: Notifications
+  - name: Donations
+  - name: History
+  - name: Reports
+  - name: Settings
+
+paths:
+  /auth/me/:
+    get:
+      tags:
+        - Authentication
+      summary: Get the authenticated user's profile
+      description: Returns the application profile and role for the user identified by the verified Firebase ID token.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email_verified:
+                    type: boolean
+                    description: Whether the user's email address is verified by Firebase.
+                  uid:
+                    type: string
+                    description: Firebase user UID
+                  email:
+                    type: string
+                    format: email
+                  role:
+                    type: string
+                    enum:
+                      - super_admin
+                      - hospital_admin
+                      - community_admin
+                      - donor
+                  status:
+                    type: string
+                    enum:
+                      - pending
+                      - active
+                      - rejected
+                      - suspended
+        '401':
+          description: Missing, invalid, or expired Firebase ID token
+        '403':
+          description: User is authenticated but not permitted to access this resource
+    patch:
+      tags:
+        - Authentication
+      summary: Update the authenticated user's profile
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                phone:
+                  type: string
+              minProperties: 1
+      responses:
+        '200':
+          description: Profile updated successfully
+        '400':
+          description: Invalid profile data
+        '401':
+          description: Missing or invalid Firebase ID token
+
+  /auth/register/:
+    post:
+      tags:
+        - Authentication
+      summary: Create a BloodBridge user profile
+      description: Creates an application profile for an existing Firebase-authenticated user.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - full_name
+                - role
+                - phone
+              properties:
+                full_name:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - hospital_admin
+                    - community_admin
+                    - donor
+                phone:
+                  type: string
+      responses:
+        '201':
+          description: User profile created successfully
+        '400':
+          description: Invalid registration details
+        '401':
+          description: Invalid or missing Firebase ID token
+        '409':
+          description: Profile already exists
+
+  /hospitals/registration/:
+    post:
+      tags:
+        - Hospitals
+      summary: Submit hospital registration
+      description: Submits hospital details for Super Admin verification. The hospital remains pending until approved.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hospital_name
+                - registration_number
+                - address
+                - phone
+              properties:
+                hospital_name:
+                  type: string
+                registration_number:
+                  type: string
+                address:
+                  type: string
+                phone:
+                  type: string
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+      responses:
+        '201':
+          description: Hospital registration submitted for approval
+        '400':
+          description: Invalid hospital details
+        '401':
+          description: Missing or invalid Firebase ID token
+        '409':
+          description: Hospital registration already exists
+
+  /communities/registration/:
+    post:
+      tags:
+        - Communities
+      summary: Submit community registration
+      description: Submits community details for Super Admin verification. The community remains pending until approved.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - community_name
+                - description
+                - address
+                - phone
+              properties:
+                community_name:
+                  type: string
+                description:
+                  type: string
+                address:
+                  type: string
+                phone:
+                  type: string
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+      responses:
+        '201':
+          description: Community registration submitted for approval
+        '400':
+          description: Invalid community details
+        '401':
+          description: Missing or invalid Firebase ID token
+        '409':
+          description: Community registration already exists
+  /admin/hospitals/{hospital_id}/review/:
+    patch:
+      tags:
+        - Admin
+      summary: Approve or reject a hospital registration
+      description: Allows only the Super Admin to review a pending hospital. Approval activates the hospital workspace.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: hospital_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - rejected
+                review_note:
+                  type: string
+      responses:
+        '200':
+          description: Hospital registration reviewed successfully
+        '400':
+          description: Invalid review status
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may review registrations
+        '404':
+          description: Hospital registration not found
+
+  /admin/communities/{community_id}/review/:
+    patch:
+      tags:
+        - Admin
+      summary: Approve or reject a community registration
+      description: Allows only the Super Admin to review a pending community. Approval activates the community workspace.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - rejected
+                review_note:
+                  type: string
+      responses:
+        '200':
+          description: Community registration reviewed successfully
+        '400':
+          description: Invalid review status
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may review registrations
+        '404':
+          description: Community registration not found
+  /communities/{community_id}/join-requests/:
+    
+    get:
+      tags:
+        - Communities
+      summary: List donor membership requests
+      description: Allows the community admin to view membership requests for their community.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, accepted, rejected]
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Membership requests retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the relevant community admin may view requests
+        '404':
+          description: Community not found
+
+    post:
+      tags:
+        - Donors
+      summary: Request to join a community
+      description: Allows an authenticated donor to request membership in an approved community. Membership remains pending until the community admin reviews it.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Community membership request submitted
+        '400':
+          description: Invalid request or donor profile incomplete
+        '401':
+          description: Authentication required
+        '403':
+          description: Only eligible donors may request membership
+        '404':
+          description: Approved community not found
+        '409':
+          description: Membership request already exists
+  /communities/{community_id}/join-requests/{request_id}/review/:
+    patch:
+      tags:
+        - Communities
+      summary: Accept or reject a donor membership request
+      description: Allows the community admin to review a pending membership request for their community. Acceptance activates the donor's membership.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - accepted
+                    - rejected
+                review_note:
+                  type: string
+      responses:
+        '200':
+          description: Membership request reviewed successfully
+        '400':
+          description: Invalid review status
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the relevant community admin may review this request
+        '404':
+          description: Membership request not found
+  /donors/me/:
+    get:
+      tags:
+        - Donors
+      summary: Get my donor profile
+      description: Returns the authenticated donor's profile, blood group, availability, location, and community membership status.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Donor profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  donor_id:
+                    type: integer
+                  full_name:
+                    type: string
+                  blood_group:
+                    type: string
+                    enum: [A+, A-, B+, B-, AB+, AB-, O+, O-]
+                  available:
+                    type: boolean
+                  latitude:
+                    type: number
+                    format: double
+                  longitude:
+                    type: number
+                    format: double
+                  membership_status:
+                    type: string
+                    enum: [pending, active, rejected, none]
+        '401':
+          description: Authentication required
+        '403':
+          description: An eligible donor profile is required
+    patch:
+      tags:
+        - Donors
+      summary: Update my donor profile
+      description: Updates permitted donor details, availability, and location.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                blood_group:
+                  type: string
+                  enum: [A+, A-, B+, B-, AB+, AB-, O+, O-]
+                available:
+                  type: boolean
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+              minProperties: 1
+      responses:
+        '200':
+          description: Donor profile updated successfully
+        '400':
+          description: Invalid donor details
+        '401':
+          description: Authentication required
+        '403':
+          description: Donor profile update not permitted
+  /blood-requests/:
+    post:
+      tags:
+        - Blood Requests
+      summary: Create a blood request
+      description: Allows an approved hospital admin to request blood. The backend validates hospital approval and creates the request for donor matching.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - blood_group
+                - units
+                - urgency
+                - hospital_address
+              properties:
+                blood_group:
+                  type: string
+                  enum: [A+, A-, B+, B-, AB+, AB-, O+, O-]
+                units:
+                  type: integer
+                  minimum: 1
+                urgency:
+                  type: string
+                  enum: [normal, urgent, emergency]
+                hospital_address:
+                  type: string
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+                required_by:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Blood request created successfully
+        '400':
+          description: Invalid blood request details
+        '401':
+          description: Authentication required
+        '403':
+          description: Only an approved hospital admin may create blood requests
+
+    get:
+      tags:
+        - Blood Requests
+      summary: List my hospital's blood requests
+      description: Returns paginated blood requests created by the authenticated hospital. Hospital admins cannot view another hospital's requests.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [open, matching, fulfilled, cancelled]
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Hospital blood requests retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only an approved hospital admin may list requests
+  /blood-requests/{request_id}/matches/:
+    get:
+      tags:
+        - Matching
+      summary: Get matched donors for a blood request
+      description: Returns eligible donor matches for a blood request owned by the authenticated hospital. Private contact information is not disclosed at this stage.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Matched donors retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning hospital may view matches
+        '404':
+          description: Blood request not found
+  /blood-requests/{request_id}/select-donors/:
+    post:
+      tags:
+        - Matching
+      summary: Select donors for a blood request
+      description: Allows the owning approved hospital to select up to 7 eligible matched donors. Selected donors and their communities are notified. The backend rejects selections exceeding the limit.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - donor_ids
+              properties:
+                donor_ids:
+                  type: array
+                  minItems: 1
+                  maxItems: 7
+                  uniqueItems: true
+                  items:
+                    type: integer
+      responses:
+        '201':
+          description: Donors selected and notifications initiated
+        '400':
+          description: Invalid selection or more than 7 donors
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning approved hospital may select donors
+        '404':
+          description: Blood request or eligible donor not found
+        '409':
+          description: Request is no longer accepting donor selections
+  /blood-requests/{request_id}/respond/:
+    patch:
+      tags:
+        - Donors
+        - Blood Requests
+      summary: Accept or reject a selected blood request
+      description: Allows only a donor specifically selected for this request to accept or reject it. The donor must be eligible, and the backend must verify the selection before recording the response.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - response
+              properties:
+                response:
+                  type: string
+                  enum:
+                    - accepted
+                    - rejected
+      responses:
+        '200':
+          description: Donor response recorded successfully
+        '400':
+          description: Invalid response or donor is not eligible
+        '401':
+          description: Authentication required
+        '403':
+          description: Donor was not selected for this request
+        '404':
+          description: Blood request not found
+        '409':
+          description: Request is closed or the donor has already responded
+  /notifications/:
+    get:
+      tags:
+        - Notifications
+      summary: List my notifications
+      description: Returns paginated notifications for the authenticated user, including relevant blood requests, membership updates, and registration status changes.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: unread_only
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+        '401':
+          description: Authentication required
+  /notifications/{notification_id}/read/:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark a notification as read
+      description: Marks a notification as read only for its intended recipient.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+        '401':
+          description: Authentication required
+        '403':
+          description: Notification does not belong to the authenticated user
+        '404':
+          description: Notification not found
+  /donations/history/:
+    get:
+      tags:
+        - Donations
+        - History
+      summary: View my donation history
+      description: Returns the authenticated donor's recorded donation history, including donation date, blood group, and status.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Donation history retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: An eligible donor profile is required
+
+  /donors/me/eligibility/:
+    get:
+      tags:
+        - Donors
+        - Donations
+      summary: Check my donation eligibility
+      description: Returns the donor's current donation eligibility based on recorded donation history, configured cooldown rules, and other applicable eligibility checks.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Eligibility status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - eligible
+                properties:
+                  eligible:
+                    type: boolean
+                  next_eligible_date:
+                    type: string
+                    format: date
+                    nullable: true
+                  reason:
+                    type: string
+                    nullable: true
+        '401':
+          description: Authentication required
+        '403':
+          description: An eligible donor profile is required
+  /dashboard/stats/:
+    get:
+      tags:
+        - History
+        - Reports
+      summary: Get dashboard statistics
+      description: Returns role-specific dashboard statistics for the authenticated user, limited to data they are authorized to access.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Dashboard statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_requests:
+                    type: integer
+                  completed_donations:
+                    type: integer
+                  pending_requests:
+                    type: integer
+                  active_donors:
+                    type: integer
+        '401':
+          description: Authentication required
+        '403':
+          description: User role does not permit access to the requested statistics
+  /settings/:
+    get:
+      tags:
+        - Settings
+      summary: Get my account settings
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Account settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  theme:
+                    type: string
+                    enum: [light, dark, system]
+                  email_notifications:
+                    type: boolean
+                  push_notifications:
+                    type: boolean
+        '401':
+          description: Authentication required
+    patch:
+      tags:
+        - Settings
+      summary: Update my account settings
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                theme:
+                  type: string
+                  enum: [light, dark, system]
+                email_notifications:
+                  type: boolean
+                push_notifications:
+                  type: boolean
+              minProperties: 1
+      responses:
+        '200':
+          description: Settings updated successfully
+        '400':
+          description: Invalid settings
+        '401':
+          description: Authentication required
+  /history/:
+    get:
+      tags:
+        - History
+      summary: Get my activity history
+      description: Returns paginated activity records relevant to the authenticated user's role, such as blood requests, membership changes, and donation activity. Only authorized records are returned.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: activity_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [blood_request, donation, membership]
+      responses:
+        '200':
+          description: Activity history retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: User is not authorized to access the requested history
+  /admin/hospitals/pending/:
+    get:
+      tags:
+        - Admin
+      summary: List pending hospital registrations
+      description: Returns hospital registrations awaiting Super Admin review.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Pending hospital registrations retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may view pending registrations
+
+  /admin/communities/pending/:
+    get:
+      tags:
+        - Admin
+      summary: List pending community registrations
+      description: Returns community registrations awaiting Super Admin review.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Pending community registrations retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may view pending registrations
+
+  /donors/me/requests/:
+    get:
+      tags:
+        - Donors
+      summary: List blood requests assigned to the current donor
+      description: Returns only eligible blood requests for which the authenticated donor has been specifically selected by a hospital.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - pending
+              - accepted
+              - rejected
+      responses:
+        '200':
+          description: Selected blood requests retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only an authorized donor may access these requests
+
+
+  /blood-requests/{request_id}/donors/{donor_id}/contact/:
+    get:
+      tags:
+        - Blood Requests
+      summary: View an authorized donor's contact details
+      description: Returns donor contact details only when the hospital owns the blood request, the donor was selected, and the required acceptance has been recorded.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: donor_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Authorized donor contact details retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Contact details are not authorized for this user
+        '404':
+          description: Request or donor not found
+
+  /blood-requests/{request_id}/:
+    get:
+      tags:
+        - Blood Requests
+      summary: Get a specific blood request
+      description: Returns the details of a blood request owned by the authenticated hospital.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Blood request retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning hospital may view this request
+        '404':
+          description: Blood request not found
+
+    patch:
+      tags:
+        - Blood Requests
+      summary: Update or cancel a blood request
+      description: Allows the owning hospital to update an open request or cancel it. The backend validates which changes are permitted.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - open
+                    - cancelled
+                urgency:
+                  type: string
+                  enum:
+                    - normal
+                    - urgent
+                    - emergency
+                units:
+                  type: integer
+                  minimum: 1
+                required_by:
+                  type: string
+                  format: date-time
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Blood request updated successfully
+        '400':
+          description: Invalid changes or request cannot be updated
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning hospital may update this request
+        '404':
+          description: Blood request not found
+
+
+  /communities/:
+    get:
+      tags:
+        - Communities
+      summary: Browse approved communities
+      description: Lists approved communities that donors can review before requesting membership.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Approved communities retrieved successfully
+        '401':
+          description: Authentication required
+
+  /communities/{community_id}/:
+    get:
+      tags:
+        - Communities
+      summary: View community details
+      description: Returns public details and verification status for an approved community.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Community details retrieved successfully
+        '401':
+          description: Authentication required
+        '404':
+          description: Community not found
+
+  /communities/{community_id}/reviews/:
+    get:
+      tags:
+        - Communities
+      summary: List community reviews
+      description: Returns reviews that help donors evaluate a community before joining.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Community reviews retrieved successfully
+        '401':
+          description: Authentication required
+        '404':
+          description: Community not found
+    post:
+      tags:
+        - Donors
+      summary: Submit a community review
+      description: Allows an eligible donor to review a community they have been a member of. The backend validates eligibility and prevents duplicate reviews.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                  maxLength: 1000
+      responses:
+        '201':
+          description: Community review submitted successfully
+        '400':
+          description: Invalid review or review already submitted
+        '401':
+          description: Authentication required
+        '403':
+          description: Donor is not eligible to review this community
+        '404':
+          description: Community not found
+
+  /communities/{community_id}/members/:
+    get:
+      tags:
+        - Communities
+      summary: List community members
+      description: Allows the community admin to view the community's approved members.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Community members retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the community admin may view members
+        '404':
+          description: Community not found
+
+  /communities/{community_id}/members/{donor_id}/:
+    delete:
+      tags:
+        - Communities
+      summary: Remove a donor from a community
+      description: Allows the community admin to remove an existing member. The backend records the membership change.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: community_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: donor_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Donor removed from the community
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the community admin may remove members
+        '404':
+          description: Community or member not found
+
+  /hospitals/me/registration/:
+    get:
+      tags:
+        - Hospitals
+      summary: View own hospital registration status
+      description: Returns the authenticated hospital admin's registration details and Super Admin review status.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Hospital registration status retrieved successfully
+        '401':
+          description: Authentication required
+        '404':
+          description: Hospital registration not found
+
+  /communities/me/registration/:
+    get:
+      tags:
+        - Communities
+      summary: View own community registration status
+      description: Returns the authenticated community admin's registration details and Super Admin review status.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Community registration status retrieved successfully
+        '401':
+          description: Authentication required
+        '404':
+          description: Community registration not found
+
+  /notifications/read-all/:
+    post:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Marks all notifications belonging to the authenticated user as read.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Notifications marked as read successfully
+        '401':
+          description: Authentication required
+
+  /admin/reports/:
+    get:
+      tags:
+        - Reports
+      summary: Retrieve platform reports
+      description: Returns platform-wide operational statistics and reports for the Super Admin only.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Platform reports retrieved successfully
+        '400':
+          description: Invalid date range
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may access platform reports
+
+  /hospitals/me/:
+    get:
+      tags:
+        - Hospitals
+      summary: View the current hospital profile
+      description: Returns the authenticated hospital admin's organization profile, verification status, and registration details.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Hospital profile retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only hospital admins may access this profile
+        '404':
+          description: Hospital profile not found
+
+  /communities/me/:
+    get:
+      tags:
+        - Communities
+      summary: View the current community profile
+      description: Returns the authenticated community admin's organization profile, verification status, and registration details.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Community profile retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only community admins may access this profile
+        '404':
+          description: Community profile not found
+
+  /blood-requests/{request_id}/selected-donors/:
+    get:
+      tags:
+        - Blood Requests
+      summary: View selected donors and their response status
+      description: Returns donors selected for the authenticated hospital's blood request and each donor's response status. Private contact details are excluded until authorized.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Selected donors retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning hospital may view selected donors
+        '404':
+          description: Blood request not found
+
+  /blood-requests/{request_id}/donations/:
+    post:
+      tags:
+        - Donations
+      summary: Record a completed donation
+      description: Allows the hospital that owns the blood request to record a completed donation for a selected donor. The backend validates donor selection, acceptance, request status, and donation eligibility.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - donor_id
+                - donated_at
+              properties:
+                donor_id:
+                  type: string
+                donated_at:
+                  type: string
+                  format: date-time
+                units:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Donation recorded successfully
+        '400':
+          description: Invalid donation data or donor is not eligible
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the owning hospital may record this donation
+        '404':
+          description: Request or donor not found
+        '409':
+          description: Donation has already been recorded
+  
+
+  /profiles/me/:
+    get:
+      tags:
+        - Profiles
+      summary: Get the current user's profile
+      description: Returns the authenticated user's application profile and role.
+      security:
+        - FirebaseBearer: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+        '401':
+          description: Authentication required
+        '404':
+          description: Application profile not found
+    patch:
+      tags:
+        - Profiles
+      summary: Update the current user's basic profile
+      description: Updates editable profile fields without allowing role or account status changes.
+      security:
+        - FirebaseBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated successfully
+        '400':
+          description: Invalid profile data
+        '401':
+          description: Authentication required
+
+  /admin/hospitals/:
+    get:
+      tags:
+        - Admin
+      summary: List hospital registrations
+      description: Allows the Super Admin to view hospital registrations by status.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Hospital registrations retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may list registrations
+
+  /admin/communities/:
+    get:
+      tags:
+        - Admin
+      summary: List community registrations
+      description: Allows the Super Admin to view community registrations by status.
+      security:
+        - FirebaseBearer: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, rejected]
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Community registrations retrieved successfully
+        '401':
+          description: Authentication required
+        '403':
+          description: Only the Super Admin may list registrations
+
+
+components:
+  securitySchemes:
+    FirebaseBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase ID token verified by the Django REST API.
+
+security:
+  - FirebaseBearer: []
