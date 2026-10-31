@@ -15,3 +15,5 @@ build/
 
 # Local database backups
 backend/backups/
+
+backend/db.sqlite3
