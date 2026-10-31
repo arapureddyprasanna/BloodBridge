@@ -1,0 +1,79 @@
+
+.email-verification-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #fffaf7, #f3dedc);
+  color: #2d2525;
+}
+
+.email-verification-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 36px 28px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #ead5d2;
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(100, 25, 35, 0.1);
+}
+
+.email-verification-icon {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #f3dedc;
+  color: #7a1f2b;
+  font-size: 32px;
+}
+
+.email-verification-card h1 {
+  margin: 0 0 14px;
+  color: #7a1f2b;
+  font-size: 28px;
+}
+
+.email-verification-card p {
+  color: #756868;
+  line-height: 1.6;
+}
+
+.email-verification-card .verification-email {
+  margin: 20px 0;
+  color: #7a1f2b;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.email-verification-card button {
+  width: 100%;
+  padding: 13px 16px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #7a1f2b;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.email-verification-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.email-verification-card button.verification-secondary-button {
+  background: #f3dedc;
+  color: #7a1f2b;
+}
+
+.email-verification-card button.verification-link-button {
+  background: transparent;
+  color: #7a1f2b;
+}

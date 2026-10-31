@@ -1,0 +1,2466 @@
+/* =========================================================
+   BLOODBRIDGE — DONOR WORKSPACE SHARED CSS
+   Dashboard first, reusable across all Donor pages.
+   ========================================================= */
+
+/* =========================================================
+   PAGE SHELL
+   ========================================================= */
+
+.bb-page-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  overflow-wrap: anywhere;
+}
+
+.bb-donor-shell .bb-admin-page-content {
+  padding: 28px 32px 36px;
+}
+
+.bb-donor-shell .bb-admin-main {
+  background: #faf5f2;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.bb-primary-button,
+.bb-secondary-button,
+.bb-text-button {
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.bb-primary-button,
+.bb-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.bb-primary-button {
+  border: 1px solid #7a1f2b;
+  background: #7a1f2b;
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(122, 31, 43, 0.12);
+}
+
+.bb-primary-button:hover {
+  background: #641923;
+  border-color: #641923;
+  transform: translateY(-1px);
+}
+
+.bb-secondary-button {
+  border: 1px solid #e6d8d5;
+  background: #fffdfc;
+  color: #2d2525;
+}
+
+.bb-secondary-button:hover {
+  background: #faf5f2;
+  transform: translateY(-1px);
+}
+
+.bb-text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #7a1f2b;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.bb-text-button:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.bb-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.bb-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bb-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.bb-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  border: 1px solid #e6d8d5;
+  border-radius: 15px;
+  background: linear-gradient(
+    135deg,
+    #fffdfc 0%,
+    #faf5f2 100%
+  );
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.04);
+}
+
+.bb-hero-copy {
+  min-width: 0;
+}
+
+.bb-hero-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #7a1f2b;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.bb-hero-title {
+  margin: 0;
+  color: #2d2525;
+  font-size: clamp(1.7rem, 2.8vw, 2.25rem);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.bb-hero-description {
+  max-width: 650px;
+  margin: 7px 0 0;
+  color: #756868;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.bb-hero-action {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   STATUS / AVAILABILITY
+   ========================================================= */
+
+.bb-status-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 68px;
+  padding: 13px 16px;
+  border: 1px solid #e6d8d5;
+  border-radius: 12px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.03);
+}
+
+.bb-status-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: #e8c9c7;
+}
+
+.bb-status-icon::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #7a1f2b;
+}
+
+.bb-status-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.bb-status-content strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #2d2525;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bb-status-content p {
+  margin: 0;
+  color: #756868;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.bb-status-action {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.bb-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.bb-stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 7px;
+  min-height: 124px;
+  padding: 17px 18px;
+  border: 1px solid #e6d8d5;
+  border-radius: 13px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.04);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.bb-stat-card:hover {
+  border-color: #d8c7c3;
+  box-shadow: 0 6px 18px rgba(45, 37, 37, 0.05);
+}
+
+.bb-stat-label {
+  margin: 0;
+  color: #756868;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bb-stat-value {
+  margin: 0;
+  color: #2d2525;
+  font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.bb-stat-meta {
+  margin: 0;
+  color: #756868;
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   GENERIC CARD
+   ========================================================= */
+
+.bb-card {
+  padding: 20px;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.04);
+}
+
+.bb-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bb-card-heading {
+  min-width: 0;
+}
+
+.bb-card-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #7a1f2b;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bb-card-title {
+  margin: 0;
+  color: #2d2525;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.bb-card-description {
+  margin: 4px 0 0;
+  color: #756868;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.bb-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bb-section-heading {
+  min-width: 0;
+}
+
+.bb-section-title {
+  margin: 0;
+  color: #2d2525;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.bb-section-description {
+  margin: 3px 0 0;
+  color: #756868;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   REQUEST LIST
+   ========================================================= */
+
+.bb-request-list {
+  display: grid;
+  gap: 12px;
+}
+
+/* These classes are shared with future request/history pages. */
+
+.bb-request-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 17px;
+  border: 1px solid #e6d8d5;
+  border-radius: 13px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.04);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.bb-request-card:hover {
+  border-color: #d5c2be;
+  box-shadow: 0 6px 18px rgba(45, 37, 37, 0.05);
+}
+
+.bb-request-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bb-request-heading {
+  min-width: 0;
+}
+
+.bb-request-label {
+  margin: 0 0 4px;
+  color: #756868;
+  font-size: 0.61rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bb-request-title {
+  margin: 0;
+  color: #2d2525;
+  font-size: 1rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.bb-request-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bb-request-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 8px;
+  border: 1px solid #e6d8d5;
+  border-radius: 7px;
+  background: #faf5f2;
+  color: #756868;
+  font-size: 0.68rem;
+}
+
+.bb-request-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bb-request-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid #e6d8d5;
+  border-radius: 9px;
+  background: #fcf9f8;
+}
+
+.bb-request-detail-label {
+  color: #756868;
+  font-size: 0.61rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.bb-request-detail-value {
+  color: #2d2525;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.bb-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.bb-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bb-status-badge--success {
+  background: rgba(88, 116, 95, 0.12);
+  border-color: rgba(88, 116, 95, 0.2);
+  color: #58745f;
+}
+
+.bb-status-badge--warning {
+  background: rgba(168, 120, 62, 0.12);
+  border-color: rgba(168, 120, 62, 0.2);
+  color: #a8783e;
+}
+
+.bb-status-badge--danger {
+  background: rgba(163, 58, 69, 0.1);
+  border-color: rgba(163, 58, 69, 0.2);
+  color: #a33a45;
+}
+
+.bb-status-badge--info {
+  background: rgba(107, 105, 125, 0.12);
+  border-color: rgba(107, 105, 125, 0.2);
+  color: #6b697d;
+}
+
+.bb-status-badge--neutral {
+  background: rgba(117, 104, 104, 0.09);
+  border-color: rgba(117, 104, 104, 0.2);
+  color: #756868;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
+.bb-action-list {
+  display: grid;
+  gap: 6px;
+}
+
+.bb-action-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.bb-action-item:hover {
+  background: #faf5f2;
+  border-color: #e6d8d5;
+  transform: translateY(-1px);
+}
+
+.bb-action-icon {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  border-radius: 8px;
+  background: #e8c9c7;
+  color: #7a1f2b;
+  font-size: 0.85rem;
+}
+
+.bb-action-content {
+  min-width: 0;
+}
+
+.bb-action-content strong {
+  display: block;
+  color: #2d2525;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.bb-action-content small {
+  display: block;
+  margin-top: 2px;
+  color: #756868;
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   PRIVACY / INFORMATION BOX
+   ========================================================= */
+
+.bb-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 15px 17px;
+  border: 1px solid #e6d8d5;
+  border-radius: 12px;
+  background: rgba(122, 31, 43, 0.025);
+}
+
+.bb-info-box-title {
+  margin: 0;
+  color: #2d2525;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.bb-info-box p {
+  margin: 0;
+  color: #756868;
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+   ========================================================= */
+
+.bb-empty-state,
+.bb-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 165px;
+  padding: 24px 18px;
+  border: 1px dashed #e6d8d5;
+  border-radius: 13px;
+  background: #fffdfc;
+  text-align: center;
+}
+
+.bb-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e8c9c7;
+  color: #7a1f2b;
+  font-size: 1.1rem;
+}
+
+.bb-empty-state h3,
+.bb-loading-state p {
+  margin: 0;
+  color: #2d2525;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.bb-empty-state p {
+  max-width: 500px;
+  margin: 0;
+  color: #756868;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.bb-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(122, 31, 43, 0.12);
+  border-top-color: #7a1f2b;
+  border-radius: 50%;
+  animation: bb-spin 0.8s linear infinite;
+}
+
+@keyframes bb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   SEARCH / FILTER
+   Ready for Requests / History pages.
+   ========================================================= */
+
+.bb-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.bb-search-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: min(100%, 300px);
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid #e6d8d5;
+  border-radius: 9px;
+  background: #fffdfc;
+}
+
+.bb-search-field span {
+  color: #756868;
+  font-size: 0.9rem;
+}
+
+.bb-search-field input {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #2d2525;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.bb-search-field:focus-within {
+  outline: 2px solid rgba(122, 31, 43, 0.1);
+  outline-offset: 1px;
+  border-color: #b97878;
+}
+
+.bb-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bb-pill {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e6d8d5;
+  border-radius: 8px;
+  background: #fffdfc;
+  color: #756868;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.bb-pill.is-active {
+  border-color: rgba(122, 31, 43, 0.2);
+  background: rgba(122, 31, 43, 0.08);
+  color: #7a1f2b;
+}
+
+/* =========================================================
+   FORM BASICS
+   Ready for Profile / Availability / Settings.
+   ========================================================= */
+
+.bb-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.bb-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bb-form-field label {
+  color: #756868;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.bb-input,
+.bb-select {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid #e6d8d5;
+  border-radius: 9px;
+  background: #fffdfc;
+  color: #2d2525;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.bb-input:focus,
+.bb-select:focus {
+  outline: 2px solid rgba(122, 31, 43, 0.1);
+  outline-offset: 1px;
+  border-color: #b97878;
+}
+
+/* =========================================================
+   TABLE
+   Ready for History / management-style views.
+   ========================================================= */
+
+.bb-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e6d8d5;
+  border-radius: 12px;
+  background: #fffdfc;
+}
+
+.bb-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bb-data-table th,
+.bb-data-table td {
+  padding: 11px 13px;
+  border-bottom: 1px solid #e6d8d5;
+  text-align: left;
+}
+
+.bb-data-table th {
+  background: #faf5f2;
+  color: #756868;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.bb-data-table td {
+  color: #2d2525;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.bb-data-table tbody tr:hover {
+  background: #fffaf9;
+}
+
+.bb-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* =========================================================
+   TOGGLE
+   Ready for Availability / Settings.
+   ========================================================= */
+
+.bb-toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex: 0 0 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #d7c9c6;
+  cursor: pointer;
+}
+
+.bb-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 160ms ease;
+}
+
+.bb-toggle.is-enabled {
+  background: #7a1f2b;
+}
+
+.bb-toggle.is-enabled::after {
+  transform: translateX(18px);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .bb-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .bb-page-shell {
+    gap: 18px;
+  }
+
+  .bb-hero-card,
+  .bb-section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bb-hero-action {
+    width: 100%;
+  }
+
+  .bb-hero-action .bb-primary-button {
+    width: 100%;
+  }
+
+  .bb-grid--two,
+  .bb-grid--three,
+  .bb-form-grid,
+  .bb-request-details {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .bb-donor-shell .bb-admin-page-content {
+    padding: 18px 14px 24px;
+  }
+  .bb-page-shell {
+    gap: 15px;
+  }
+
+  .bb-hero-card {
+    padding: 19px;
+    border-radius: 13px;
+  }
+
+  .bb-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .bb-hero-description {
+    font-size: 0.76rem;
+  }
+
+  .bb-stat-card {
+    min-height: 105px;
+    padding: 15px;
+  }
+
+  .bb-stat-value {
+    font-size: 1.15rem;
+  }
+
+  .bb-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .bb-section-header {
+    gap: 9px;
+  }
+
+  .bb-request-card {
+    padding: 15px;
+  }
+
+  .bb-request-header {
+    flex-direction: column;
+  }
+
+  .bb-status-panel {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .bb-status-action {
+    align-self: center;
+  }
+
+  .bb-filter-bar {
+    align-items: stretch;
+  }
+
+  .bb-search-field {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   DONOR ONBOARDING — COMMUNITY SELECTION
+   ========================================================= */
+
+.bb-community-selection-page {
+  min-height: 100vh;
+  background: #faf5f2;
+  color: #2d2525;
+  font-family: "Inter", sans-serif;
+}
+
+.bb-community-selection-container {
+  width: min(1380px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-community-selection-header {
+  min-height: 76px;
+  padding: 18px 40px;
+  background: #fffdfc;
+  border-bottom: 1px solid #e6d8d5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.bb-community-selection-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bb-community-selection-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: #7a1f2b;
+  color: #fffdfc;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+
+.bb-community-selection-brand strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.bb-community-selection-brand span {
+  display: block;
+  margin-top: 2px;
+  color: #756868;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.bb-community-selection-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bb-community-selection-progress-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a39794;
+  font-size: 12px;
+}
+
+.bb-community-selection-progress-step span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f0e8e5;
+  color: #756868;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bb-community-selection-progress-step.active {
+  color: #7a1f2b;
+}
+
+.bb-community-selection-progress-step.active span {
+  background: #7a1f2b;
+  color: #fffdfc;
+}
+
+.bb-community-selection-progress-line {
+  width: 38px;
+  height: 1px;
+  background: #e6d8d5;
+}
+
+.bb-community-selection-main {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 54px 0 48px;
+  flex: 1;
+}
+
+.bb-community-selection-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 34px;
+}
+
+.bb-community-selection-eyebrow {
+  color: #7a1f2b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.bb-community-selection-intro h1 {
+  margin: 9px 0 10px;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.bb-community-selection-intro p {
+  max-width: 670px;
+  margin: 0;
+  color: #756868;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.bb-community-selection-trust {
+  min-width: 290px;
+  max-width: 340px;
+  padding: 15px 17px;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: #fffdfc;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.bb-community-selection-trust-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #e8c9c7;
+  color: #641923;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bb-community-selection-trust strong,
+.bb-community-selection-trust span {
+  display: block;
+}
+
+.bb-community-selection-trust strong {
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.bb-community-selection-trust span:last-child {
+  color: #756868;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.bb-community-selection-error {
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border: 1px solid #d7a5a5;
+  border-radius: 12px;
+  background: #fff7f7;
+  display: flex;
+  gap: 12px;
+}
+
+.bb-community-selection-error > span {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 50%;
+  background: #7a1f2b;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.bb-community-selection-error strong,
+.bb-community-selection-error p {
+  display: block;
+}
+
+.bb-community-selection-error strong {
+  font-size: 13px;
+}
+
+.bb-community-selection-error p {
+  margin: 3px 0 0;
+  color: #756868;
+  font-size: 12px;
+}
+
+.bb-community-selection-toolbar {
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: #fffdfc;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.bb-community-selection-toolbar strong,
+.bb-community-selection-toolbar span {
+  display: block;
+}
+
+.bb-community-selection-toolbar strong {
+  font-size: 14px;
+}
+
+.bb-community-selection-toolbar span {
+  margin-top: 4px;
+  color: #756868;
+  font-size: 12px;
+}
+
+.bb-community-selection-search {
+  width: min(320px, 100%);
+  height: 42px;
+  padding: 0 13px;
+  border: 1px solid #e6d8d5;
+  border-radius: 10px;
+  background: #fffdfc;
+  color: #756868;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.bb-community-selection-search:focus-within {
+  border-color: #b97878;
+  box-shadow: 0 0 0 3px rgba(185, 120, 120, 0.12);
+}
+
+.bb-community-selection-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #2d2525;
+  font: inherit;
+  font-size: 12px;
+}
+
+.bb-community-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bb-community-selection-card {
+  border: 1px solid #e6d8d5;
+  border-radius: 16px;
+  background: #fffdfc;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 350px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.bb-community-selection-card:hover {
+  transform: translateY(-2px);
+  border-color: #d6b5b3;
+  box-shadow: 0 12px 30px rgba(45, 37, 37, 0.07);
+}
+
+.bb-community-selection-card-top {
+  padding: 20px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.bb-community-selection-logo-image,
+.bb-community-selection-logo-fallback {
+  width: 58px;
+  height: 58px;
+  border-radius: 15px;
+  object-fit: cover;
+}
+
+.bb-community-selection-logo-fallback {
+  background: #e8c9c7;
+  color: #641923;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.bb-community-selection-verified {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #f6efed;
+  color: #641923;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bb-community-selection-verified span {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #7a1f2b;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+}
+
+.bb-community-selection-card-content {
+  padding: 18px 20px;
+  flex: 1;
+}
+
+.bb-community-selection-card-content h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.015em;
+}
+
+.bb-community-selection-location {
+  margin: 7px 0 0;
+  color: #756868;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bb-community-selection-description {
+  margin: 16px 0 20px;
+  color: #756868;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.bb-community-selection-metrics {
+  padding-top: 16px;
+  border-top: 1px solid #eee5e2;
+  display: flex;
+  gap: 28px;
+}
+
+.bb-community-selection-metrics div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bb-community-selection-metrics strong {
+  font-size: 13px;
+}
+
+.bb-community-selection-metrics span {
+  color: #756868;
+  font-size: 10px;
+}
+
+.bb-community-selection-card-actions {
+  padding: 14px 20px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 9px;
+}
+
+.bb-community-selection-details-button,
+.bb-community-selection-join-button,
+.bb-community-selection-secondary-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.bb-community-selection-details-button {
+  border: 1px solid #e1d3d0;
+  background: #fffdfc;
+  color: #641923;
+}
+
+.bb-community-selection-details-button:hover {
+  background: #faf5f2;
+  border-color: #cba8a5;
+}
+
+.bb-community-selection-join-button {
+  border: 1px solid #7a1f2b;
+  background: #7a1f2b;
+  color: #fffdfc;
+}
+
+.bb-community-selection-join-button:hover {
+  background: #641923;
+  border-color: #641923;
+}
+
+.bb-community-selection-details-button:disabled,
+.bb-community-selection-join-button:disabled,
+.bb-community-selection-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.bb-community-selection-empty {
+  min-height: 320px;
+  padding: 45px 24px;
+  border: 1px dashed #d8c9c5;
+  border-radius: 16px;
+  background: #fffdfc;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bb-community-selection-empty-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #f1e3e0;
+  color: #7a1f2b;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.bb-community-selection-empty h2 {
+  margin: 15px 0 7px;
+  font-size: 19px;
+}
+
+.bb-community-selection-empty p {
+  max-width: 430px;
+  margin: 0;
+  color: #756868;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.bb-community-selection-secondary-button {
+  margin-top: 18px;
+  border: 1px solid #e1d3d0;
+  background: #fffdfc;
+  color: #641923;
+}
+
+.bb-community-selection-skeleton {
+  padding: 20px;
+}
+
+.bb-community-selection-skeleton-top {
+  width: 58px;
+  height: 58px;
+  border-radius: 15px;
+  background: #eee5e2;
+}
+
+.bb-community-selection-skeleton-line,
+.bb-community-selection-skeleton-actions {
+  background: #eee5e2;
+  border-radius: 8px;
+}
+
+.bb-community-selection-skeleton-line {
+  width: 82%;
+  height: 14px;
+  margin-top: 18px;
+}
+
+.bb-community-selection-skeleton-line.large {
+  width: 55%;
+  height: 19px;
+}
+
+.bb-community-selection-skeleton-line.short {
+  width: 65%;
+  height: 12px;
+}
+
+.bb-community-selection-skeleton-actions {
+  width: 100%;
+  height: 40px;
+  margin-top: auto;
+}
+
+.bb-community-selection-footer {
+  padding: 18px 40px;
+  border-top: 1px solid #e6d8d5;
+  color: #8b7d79;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.bb-community-selection-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  padding: 24px;
+  background: rgba(45, 37, 37, 0.38);
+  display: grid;
+  place-items: center;
+}
+
+.bb-community-selection-modal {
+  width: min(650px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  border-radius: 18px;
+  background: #fffdfc;
+  box-shadow: 0 24px 70px rgba(45, 37, 37, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-community-selection-modal-header {
+  padding: 20px 22px;
+  border-bottom: 1px solid #e6d8d5;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.bb-community-selection-modal-header span {
+  color: #7a1f2b;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.bb-community-selection-modal-header h2 {
+  margin: 6px 0 0;
+  font-size: 22px;
+}
+
+.bb-community-selection-modal-header button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: #f4ecea;
+  color: #641923;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.bb-community-selection-modal-body {
+  padding: 22px;
+  overflow-y: auto;
+}
+
+.bb-community-selection-modal-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bb-community-selection-modal-summary strong,
+.bb-community-selection-modal-summary span {
+  display: block;
+}
+
+.bb-community-selection-modal-summary strong {
+  font-size: 17px;
+}
+
+.bb-community-selection-modal-summary span {
+  margin-top: 4px;
+  color: #756868;
+  font-size: 12px;
+}
+
+.bb-community-selection-modal-stats {
+  margin: 22px 0;
+  padding: 16px;
+  border: 1px solid #e6d8d5;
+  border-radius: 13px;
+  background: #faf5f2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.bb-community-selection-modal-stats div {
+  text-align: center;
+}
+
+.bb-community-selection-modal-stats strong,
+.bb-community-selection-modal-stats span {
+  display: block;
+}
+
+.bb-community-selection-modal-stats strong {
+  font-size: 15px;
+}
+
+.bb-community-selection-modal-stats span {
+  margin-top: 3px;
+  color: #756868;
+  font-size: 10px;
+}
+
+.bb-community-selection-modal-section + .bb-community-selection-modal-section {
+  margin-top: 24px;
+}
+
+.bb-community-selection-modal-section h3 {
+  margin: 0 0 7px;
+  font-size: 13px;
+}
+
+.bb-community-selection-modal-section > p {
+  margin: 0;
+  color: #756868;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.bb-community-selection-reviews {
+  display: grid;
+  gap: 10px;
+}
+
+.bb-community-selection-review {
+  padding: 13px;
+  border: 1px solid #eee5e2;
+  border-radius: 11px;
+}
+
+.bb-community-selection-review > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.bb-community-selection-review strong {
+  font-size: 12px;
+}
+
+.bb-community-selection-review span {
+  color: #7a1f2b;
+  font-size: 11px;
+}
+
+.bb-community-selection-review p {
+  margin: 7px 0 0;
+  color: #756868;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.bb-community-selection-modal-loading {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: #756868;
+  font-size: 13px;
+}
+
+.bb-community-selection-modal-footer {
+  padding: 15px 22px;
+  border-top: 1px solid #e6d8d5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+@media (max-width: 900px) {
+  .bb-community-selection-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bb-community-selection-progress {
+    width: 100%;
+  }
+
+  .bb-community-selection-intro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bb-community-selection-trust {
+    max-width: none;
+  }
+
+  .bb-community-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .bb-community-selection-header {
+    padding: 16px 20px;
+  }
+
+  .bb-community-selection-main {
+    width: min(100% - 32px, 1180px);
+    padding: 34px 0;
+  }
+
+  .bb-community-selection-progress {
+    overflow-x: auto;
+  }
+
+  .bb-community-selection-progress-step strong,
+  .bb-community-selection-progress-line {
+    display: none;
+  }
+
+  .bb-community-selection-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bb-community-selection-search {
+    width: 100%;
+  }
+
+  .bb-community-selection-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-community-selection-footer {
+    padding: 16px 20px;
+    flex-direction: column;
+  }
+
+  .bb-community-selection-modal-overlay {
+    padding: 12px;
+  }
+
+  .bb-community-selection-modal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .bb-community-selection-modal-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-community-selection-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .bb-community-selection-modal-footer button {
+    width: 100%;
+  }
+}
+
+.bb-page-shell,
+.bb-page-shell > *,
+.bb-grid > *,
+.bb-stat-grid > *,
+.bb-request-details > * {
+  min-width: 0;
+}
+
+.bb-donor-profile-card { gap: 16px; }
+.bb-donor-profile-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.bb-donor-profile-form label { display: grid; min-width: 0; gap: 7px; color: #514747; font-size: 12px; font-weight: 650; }
+.bb-donor-profile-form input { box-sizing: border-box; width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid #e6d8d5; border-radius: 9px; background: #fffdfc; color: #2d2525; font: inherit; font-size: 13px; }
+.bb-donor-profile-form input:focus { border-color: #b97878; outline: 0; box-shadow: 0 0 0 3px rgb(185 120 120 / 14%); }
+.bb-donor-profile-form input[readonly] { background: #f8f2ef; color: #756868; }
+.bb-donor-profile-actions { display: flex; grid-column: 1 / -1; justify-content: flex-end; }
+
+@media (max-width: 640px) {
+  .bb-donor-profile-form { grid-template-columns: minmax(0, 1fr); }
+  .bb-donor-profile-actions { grid-column: auto; }
+}
+
+/* Donor community profile and persisted review workflow */
+.bb-donor-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #efd4d5; border-radius: 10px; background: #fff8f7; color: #8d303b; font-size: .78rem; }
+.bb-donor-community-hero { display: grid; gap: 18px; }
+.bb-donor-community-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.bb-donor-community-heading > div { display: flex; min-width: 0; align-items: center; gap: 14px; }
+.bb-donor-community-logo { width: 58px; height: 58px; flex: 0 0 58px; border: 1px solid #e6d8d5; border-radius: 13px; background: #faf5f2; object-fit: cover; }
+.bb-donor-community-heading h2 { margin: 3px 0 4px; color: #2d2525; font-size: 1.22rem; }
+.bb-donor-community-heading p:last-child,.bb-donor-community-description { margin: 0; color: #756868; font-size: .78rem; line-height: 1.55; }
+.bb-donor-review-section,.bb-donor-announcements { display: grid; gap: 16px; }
+.bb-donor-review-summary { display: grid; justify-items: end; gap: 2px; flex: 0 0 auto; }
+.bb-donor-review-summary strong { color: #7a1f2b; font-size: 1.5rem; }
+.bb-donor-review-summary > span,.bb-donor-review-stars { color: #a8783e; letter-spacing: 2px; }
+.bb-donor-review-summary small,.bb-donor-own-review small,.bb-donor-review-item small,.bb-donor-announcement small { color: #8e8281; font-size: .68rem; }
+.bb-donor-review-form { padding: 16px; border: 1px solid #efe4e1; border-radius: 12px; background: #fff; }
+.bb-donor-review-form fieldset { display: grid; gap: 13px; min-width: 0; padding: 0; border: 0; }
+.bb-donor-review-form legend { margin-bottom: 4px; color: #2d2525; font-size: .9rem; font-weight: 700; }
+.bb-donor-rating-picker { display: flex; gap: 5px; }
+.bb-donor-rating-picker button { width: 37px; height: 37px; border: 1px solid #e6d8d5; border-radius: 9px; background: #fffdfc; color: #b8aaa7; font-size: 1.2rem; cursor: pointer; }
+.bb-donor-rating-picker button.is-selected { border-color: #e8c9c7; background: #faf0ed; color: #a8783e; }
+.bb-donor-review-form label { display: grid; gap: 7px; color: #514747; font-size: .76rem; font-weight: 650; }
+.bb-donor-review-form textarea { box-sizing: border-box; width: 100%; min-height: 100px; padding: 11px 12px; border: 1px solid #e6d8d5; border-radius: 9px; background: #fffdfc; color: #2d2525; font: inherit; resize: vertical; }
+.bb-donor-review-form textarea:focus { border-color: #b97878; outline: 0; box-shadow: 0 0 0 3px rgb(185 120 120 / 14%); }
+.bb-donor-review-form fieldset:disabled { opacity: .7; }
+.bb-donor-optional-label { color: #8e8281; font-weight: 400; }
+.bb-donor-review-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bb-donor-review-form-footer > small { color: #8e8281; font-size: .68rem; }
+.bb-donor-own-review,.bb-donor-review-item,.bb-donor-announcement { padding: 14px 0; border-top: 1px solid #efe4e1; }
+.bb-donor-own-review > div:first-child,.bb-donor-review-item header,.bb-donor-announcement header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.bb-donor-own-review > div:first-child strong,.bb-donor-review-item header strong,.bb-donor-announcement h3 { margin: 0; color: #2d2525; font-size: .82rem; }
+.bb-donor-own-review p,.bb-donor-review-item p,.bb-donor-announcement p { margin: 8px 0; color: #756868; font-size: .78rem; line-height: 1.6; white-space: pre-wrap; }
+.bb-donor-review-list h3 { margin: 0 0 4px; color: #2d2525; font-size: .9rem; }
+.bb-donor-danger-button { border-color: #efd4d5; color: #a33a45; }
+.bb-donor-announcement h3 { overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .bb-donor-error,.bb-donor-review-form-footer { align-items: stretch; flex-direction: column; }
+  .bb-donor-community-heading { align-items: flex-start; }
+  .bb-donor-review-summary { justify-items: start; }
+  .bb-donor-own-review .bb-page-actions { justify-content: flex-start; }
+  .bb-donor-rating-picker button { width: 42px; height: 42px; }
+}
+
+
+
+/* =========================================================
+   DONOR REQUESTS — POLISHED REQUEST INBOX
+   Shared by Requests and Request Details.
+   ========================================================= */
+
+.bb-request-overview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 22px;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    #fffdfc 0%,
+    #faf5f2 100%
+  );
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.035);
+}
+
+.bb-request-overview-copy {
+  min-width: 0;
+}
+
+.bb-request-overview-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #7a1f2b;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.bb-request-overview-copy h2 {
+  margin: 0;
+  color: #2d2525;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.bb-request-overview-copy p {
+  max-width: 620px;
+  margin: 5px 0 0;
+  color: #756868;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.bb-request-overview-stats {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.bb-request-overview-stats > div {
+  min-width: 105px;
+  padding: 10px 12px;
+  border: 1px solid #e6d8d5;
+  border-radius: 10px;
+  background: #fffdfc;
+  text-align: center;
+}
+
+.bb-request-overview-stats strong,
+.bb-request-overview-stats span {
+  display: block;
+}
+
+.bb-request-overview-stats strong {
+  color: #7a1f2b;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.bb-request-overview-stats span {
+  margin-top: 3px;
+  color: #756868;
+  font-size: 0.61rem;
+}
+
+/* =========================================================
+   REQUEST LIST
+   ========================================================= */
+
+.bb-donor-request-list {
+  display: grid;
+  gap: 12px;
+}
+
+.bb-donor-request-card {
+  overflow: hidden;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.035);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.bb-donor-request-card:hover {
+  transform: translateY(-1px);
+  border-color: #d5c2be;
+  box-shadow: 0 8px 22px rgba(45, 37, 37, 0.06);
+}
+
+.bb-donor-request-main {
+  display: flex;
+  gap: 18px;
+  padding: 18px;
+}
+
+.bb-donor-request-blood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border: 1px solid #e8c9c7;
+  border-radius: 14px;
+  background: #faf0ed;
+}
+
+.bb-donor-request-blood span {
+  color: #756868;
+  font-size: 0.54rem;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.bb-donor-request-blood strong {
+  margin-top: 4px;
+  color: #7a1f2b;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bb-donor-request-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.bb-donor-request-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bb-donor-request-heading h2 {
+  margin: 3px 0 0;
+  color: #2d2525;
+  font-size: 1rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.bb-donor-request-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.bb-donor-request-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 8px;
+  border: 1px solid #e6d8d5;
+  border-radius: 7px;
+  background: #faf5f2;
+  color: #756868;
+  font-size: 0.66rem;
+}
+
+.bb-donor-request-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.bb-donor-request-details > div {
+  padding: 9px 10px;
+  border: 1px solid #eee5e2;
+  border-radius: 9px;
+  background: #fffaf9;
+}
+
+.bb-donor-request-details span,
+.bb-donor-request-details strong {
+  display: block;
+}
+
+.bb-donor-request-details span {
+  color: #8e8281;
+  font-size: 0.59rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bb-donor-request-details strong {
+  margin-top: 3px;
+  color: #2d2525;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.bb-donor-request-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-top: 1px solid #eee5e2;
+  background: #fffbfa;
+}
+
+.bb-donor-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.bb-donor-decline-button {
+  color: #8d303b;
+}
+
+/* =========================================================
+   REQUEST DETAILS
+   ========================================================= */
+
+.bb-donor-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid #e6d8d5;
+  border-radius: 15px;
+  background: linear-gradient(
+    135deg,
+    #fffdfc 0%,
+    #faf5f2 100%
+  );
+  box-shadow: 0 4px 15px rgba(45, 37, 37, 0.04);
+}
+
+.bb-donor-detail-hero-blood {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  height: 82px;
+  flex: 0 0 82px;
+  border: 1px solid #e8c9c7;
+  border-radius: 16px;
+  background: #faf0ed;
+}
+
+.bb-donor-detail-hero-blood span {
+  color: #756868;
+  font-size: 0.56rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.bb-donor-detail-hero-blood strong {
+  margin-top: 5px;
+  color: #7a1f2b;
+  font-size: 1.4rem;
+}
+
+.bb-donor-detail-hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.bb-donor-detail-hero-copy h2 {
+  margin: 3px 0 4px;
+  color: #2d2525;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.bb-donor-detail-hero-copy p {
+  margin: 0;
+  color: #756868;
+  font-size: 0.76rem;
+}
+
+.bb-donor-detail-hero-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.bb-donor-detail-hero-status > span {
+  color: #8e8281;
+  font-size: 0.62rem;
+}
+
+.bb-donor-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.8fr);
+  gap: 14px;
+}
+
+.bb-donor-detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.bb-donor-detail-info-item {
+  padding: 12px;
+  border: 1px solid #eee5e2;
+  border-radius: 10px;
+  background: #fffaf9;
+}
+
+.bb-donor-detail-info-item span,
+.bb-donor-detail-info-item strong {
+  display: block;
+}
+
+.bb-donor-detail-info-item span {
+  color: #8e8281;
+  font-size: 0.61rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bb-donor-detail-info-item strong {
+  margin-top: 4px;
+  color: #2d2525;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bb-donor-detail-info-item--blood {
+  border-color: #e8c9c7;
+  background: #faf0ed;
+}
+
+.bb-donor-detail-info-item--blood strong {
+  color: #7a1f2b;
+  font-size: 1.05rem;
+}
+
+.bb-donor-hospital-card {
+  min-width: 0;
+}
+
+.bb-donor-hospital-location {
+  display: flex;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid #eee5e2;
+  border-radius: 10px;
+  background: #faf5f2;
+}
+
+.bb-donor-hospital-location-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 8px;
+  background: #e8c9c7;
+  color: #7a1f2b;
+}
+
+.bb-donor-hospital-location strong,
+.bb-donor-hospital-location span {
+  display: block;
+}
+
+.bb-donor-hospital-location strong {
+  color: #2d2525;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.bb-donor-hospital-location span {
+  margin-top: 3px;
+  color: #756868;
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.bb-donor-notes {
+  margin-top: 12px;
+  padding: 13px;
+  border-left: 3px solid #b97878;
+  border-radius: 0 9px 9px 0;
+  background: #faf5f2;
+}
+
+.bb-donor-notes > span {
+  display: block;
+  color: #7a1f2b;
+  font-size: 0.61rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.bb-donor-notes p {
+  margin: 6px 0 0;
+  color: #756868;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.bb-donor-response-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #e6d8d5;
+  border-radius: 14px;
+  background: #fffdfc;
+  box-shadow: 0 3px 12px rgba(45, 37, 37, 0.035);
+}
+
+.bb-donor-response-card h2 {
+  margin: 4px 0 5px;
+  color: #2d2525;
+  font-size: 1rem;
+}
+
+.bb-donor-response-card p {
+  max-width: 650px;
+  margin: 0;
+  color: #756868;
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.bb-donor-response-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.bb-donor-response-date {
+  flex-shrink: 0;
+  color: #756868;
+  font-size: 0.68rem;
+}
+
+.bb-page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bb-page-actions > span {
+  margin-right: auto;
+  color: #756868;
+  font-size: 0.7rem;
+}
+
+/* =========================================================
+   REQUEST RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .bb-request-overview {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bb-request-overview-stats {
+    width: 100%;
+  }
+
+  .bb-request-overview-stats > div {
+    flex: 1;
+  }
+
+  .bb-donor-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-donor-response-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bb-donor-response-actions {
+    width: 100%;
+  }
+
+  .bb-donor-response-actions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .bb-request-overview {
+    padding: 16px;
+  }
+
+  .bb-request-overview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .bb-request-overview-stats > div {
+    min-width: 0;
+    padding: 9px 6px;
+  }
+
+  .bb-request-overview-stats span {
+    font-size: 0.56rem;
+  }
+
+  .bb-donor-request-main {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .bb-donor-request-blood {
+    width: 100%;
+    height: 62px;
+    flex-basis: auto;
+    flex-direction: row;
+    gap: 7px;
+  }
+
+  .bb-donor-request-blood strong {
+    margin-top: 0;
+  }
+
+  .bb-donor-request-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bb-donor-request-details {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-donor-request-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 15px;
+  }
+
+  .bb-donor-request-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bb-donor-request-actions button,
+  .bb-donor-request-footer > a {
+    width: 100%;
+  }
+
+  .bb-donor-detail-hero {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 17px;
+  }
+
+  .bb-donor-detail-hero-blood {
+    width: 68px;
+    height: 68px;
+    flex-basis: 68px;
+  }
+
+  .bb-donor-detail-hero-copy {
+    flex-basis: calc(100% - 88px);
+  }
+
+  .bb-donor-detail-hero-status {
+    width: 100%;
+    align-items: flex-start;
+    padding-top: 4px;
+  }
+
+  .bb-donor-detail-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bb-donor-response-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bb-page-actions {
+    justify-content: stretch;
+  }
+
+  .bb-page-actions > span {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .bb-page-actions > a {
+    width: 100%;
+  }
+}

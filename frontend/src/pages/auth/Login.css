@@ -1,0 +1,1266 @@
+/* ========================================
+BLOODBRIDGE LOGIN PAGE
+Burgundy • Warm Cream • Blush Red
+======================================== */
+
+.login-page {
+--login-burgundy: #7a1f2b;
+--login-burgundy-dark: #641923;
+--login-red: #a93443;
+--login-blush: #f3dedc;
+--login-cream: #fffaf7;
+--login-text: #2d2525;
+--login-muted: #756868;
+--login-border: #e6d8d5;
+
+min-height: 100vh;
+display: grid;
+grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+background: var(--login-cream);
+color: var(--login-text);
+font-family: inherit;
+}
+
+/* ========================================
+LEFT SIDE: LOGIN FORM
+======================================== */
+
+.login-form-side {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(16px, 2.4vh, 28px) clamp(20px, 4vw, 56px) clamp(12px, 1.6vh, 20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  color: var(--login-burgundy);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  text-decoration: none;
+}
+
+.brand-drop {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #faf0ed;
+  border: 1px solid #e8c9c7;
+  color: var(--login-burgundy);
+  font-size: 18px;
+}
+
+.login-form-content {
+  width: 100%;
+  max-width: 390px;
+  margin: auto;
+}
+
+.login-eyebrow,
+.visual-kicker {
+  display: inline-block;
+  color: var(--login-red);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.login-form-content h1 {
+  margin: 6px 0 6px;
+  color: var(--login-burgundy-dark);
+  font-size: clamp(23px, 2.2vw, 29px);
+  line-height: 1.18;
+  letter-spacing: -0.8px;
+  font-weight: 800;
+}
+
+.login-description {
+  max-width: 370px;
+  margin: 0 0 16px;
+  color: var(--login-muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-form label {
+  color: #3d2f2f;
+  font-size: 12px;
+  font-weight: 650;
+  margin-bottom: 2px;
+}
+
+.login-form > input,
+.login-password-field input {
+  width: 100%;
+  min-width: 0;
+  height: 41px;
+  padding: 0 13px;
+  border: 1px solid var(--login-border);
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: var(--login-text);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.login-form > input {
+  margin-bottom: 7px;
+}
+
+.login-form input::placeholder {
+  color: #ad9e9b;
+}
+
+.login-form > input:focus,
+.login-password-field input:focus {
+  border-color: var(--login-red);
+  box-shadow: 0 0 0 3px rgb(169 52 67 / 10%);
+}
+
+.login-password-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.forgot-password,
+.login-register-prompt a {
+  color: var(--login-burgundy);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.forgot-password:hover,
+.login-register-prompt a:hover {
+  text-decoration: underline;
+}
+
+.login-password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.login-password-field input {
+  padding-right: 60px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--login-burgundy);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-submit {
+  min-height: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--login-burgundy);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+  margin-top: 3px;
+  box-shadow: 0 5px 15px rgb(122 31 43 / 16%);
+  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+.login-submit:hover {
+  background: var(--login-burgundy-dark);
+  box-shadow: 0 8px 18px rgb(122 31 43 / 22%);
+  transform: translateY(-1px);
+}
+
+.login-submit:focus-visible,
+.password-toggle:focus-visible {
+  outline: 3px solid #d9a0a5;
+  outline-offset: 2px;
+}
+
+.login-register-prompt {
+  margin: 12px 0 0;
+  color: var(--login-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.login-privacy-note {
+  margin: 8px 0 0;
+  color: #948582;
+  font-size: 10.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.login-copyright {
+  margin: 0;
+  color: #958582;
+  font-size: 10.5px;
+  text-align: center;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+/* ========================================
+RIGHT SIDE: VISUAL PANEL
+======================================== */
+
+.login-visual-side {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(12px, 1.8vh, 18px);
+  background: var(--login-cream);
+}
+
+.login-visual-frame {
+  position: relative;
+  isolation: isolate;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 2.6vh, 28px) 20px clamp(14px, 2vh, 20px);
+  border: none;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 49%, #f8e8e5 0%, transparent 52%),
+    linear-gradient(145deg, #f7e5e2 0%, #f0d2d0 52%, #f5e3df 100%);
+}
+
+/* Soft decorative background circles */
+
+.login-visual-frame::before,
+.login-visual-frame::after {
+position: absolute;
+z-index: -1;
+content: "";
+border-radius: 50%;
+pointer-events: none;
+}
+
+.login-visual-frame::before {
+width: 300px;
+height: 300px;
+top: 24%;
+left: -190px;
+border: 1px solid rgb(169 52 67 / 10%);
+box-shadow:
+0 0 0 25px rgb(169 52 67 / 3%),
+0 0 0 55px rgb(169 52 67 / 3%);
+}
+
+.login-visual-frame::after {
+width: 230px;
+height: 230px;
+right: -145px;
+bottom: 7%;
+background: rgb(255 255 255 / 20%);
+}
+
+.visual-heading {
+position: relative;
+z-index: 2;
+width: 100%;
+max-width: 440px;
+text-align: center;
+}
+
+.visual-heading h2 {
+margin: 15px 0 12px;
+color: var(--login-burgundy-dark);
+font-size: clamp(29px, 3vw, 43px);
+font-weight: 800;
+line-height: 1.16;
+letter-spacing: -1.5px;
+}
+
+.visual-heading > p {
+max-width: 360px;
+margin: 0 auto;
+color: #795f60;
+font-size: 13px;
+line-height: 1.8;
+}
+
+/* ========================================
+CENTRAL BLOOD DROP ILLUSTRATION
+======================================== */
+
+.blood-drop-scene {
+  position: relative;
+  width: min(100%, 410px);
+  height: clamp(210px, 32vh, 280px);
+  flex-shrink: 1;
+  margin: 0 auto;
+}
+
+.drop-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid rgba(169, 52, 68, 0.096);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.orbit-one {
+  width: 170px;
+  height: 170px;
+}
+
+.orbit-two {
+  width: 220px;
+  height: 220px;
+  border-style: dashed;
+  border-color: rgba(169, 52, 68, 0.213);
+}
+
+.orbit-three {
+  width: 270px;
+  height: 270px;
+  border-color: rgb(169 52 67 / 9%);
+}
+
+.drop-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: drop-rays-turn 55s linear infinite;
+}
+
+.drop-ray {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgb(246, 124, 124);
+  box-shadow: 0 2px 7px rgba(122, 31, 43, 0.27);
+  transform: translateX(-70%) rotate(calc(var(--ray-index) * 18deg));
+  transform-origin: 0 120px;
+}
+
+.main-blood-drop {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 118px;
+  height: 148px;
+  display: grid;
+  place-items: center;
+  border-radius: 48% 52% 49% 51%;
+  filter: drop-shadow(0 14px 18px rgba(122, 31, 43, 0.45));
+  transform: translate(-50%, -50%);
+  animation: blood-drop-float 4s ease-in-out infinite;
+}
+
+.blood-drop-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.floating-info-card {
+  position: absolute;
+  z-index: 3;
+  width: 170px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 11px;
+  border: 1px solid rgb(255 255 255 / 85%);
+  border-radius: 12px;
+  background: rgb(255 253 252 / 94%);
+  box-shadow: 0 8px 24px rgb(91 38 41 / 9%);
+  backdrop-filter: blur(8px);
+}
+
+.info-card-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--login-blush);
+  color: var(--login-burgundy);
+  font-size: 16px;
+}
+
+.floating-info-card h3 {
+  margin: 0 0 3px;
+  color: var(--login-burgundy-dark);
+  font-size: 10.5px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.floating-info-card p {
+  margin: 0;
+  color: var(--login-muted);
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+
+.info-card-one {
+  top: 8%;
+  left: 0;
+}
+
+.info-card-two {
+  top: 38%;
+  right: 0;
+}
+
+.info-card-three {
+  bottom: 6%;
+  left: 2%;
+}
+
+.visual-footer {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 9px;
+color: #795f60;
+font-size: 11px;
+text-align: center;
+}
+
+.visual-footer-dot {
+width: 7px;
+height: 7px;
+flex-shrink: 0;
+border-radius: 50%;
+background: #a93443;
+box-shadow: 0 0 0 4px rgb(169 52 67 / 10%);
+}
+
+/* ========================================
+ANIMATIONS
+======================================== */
+
+@keyframes blood-drop-float {
+0%,
+100% {
+transform: translate(-50%, -50%) translateY(0);
+}
+
+50% {
+transform: translate(-50%, -50%) translateY(-13px);
+}
+}
+
+@keyframes drop-rays-turn {
+from {
+transform: translate(-50%, -50%) rotate(0deg);
+}
+
+to {
+transform: translate(-50%, -50%) rotate(360deg);
+}
+}
+
+/* ========================================
+TABLET RESPONSIVENESS
+======================================== */
+
+@media (max-width: 1100px) {
+.login-page {
+grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.login-form-side {
+padding-right: 30px;
+padding-left: 30px;
+}
+
+.login-visual-side {
+padding: 16px;
+}
+
+.login-visual-frame {
+min-height: calc(100vh - 32px);
+padding-right: 15px;
+padding-left: 15px;
+}
+
+.blood-drop-scene {
+transform: scale(0.88);
+transform-origin: center;
+margin-top: -15px;
+margin-bottom: -15px;
+}
+
+.floating-info-card {
+width: 185px;
+}
+
+.info-card-one {
+left: -3px;
+}
+
+.info-card-two {
+right: -3px;
+}
+}
+
+/* ========================================
+MOBILE RESPONSIVENESS
+======================================== */
+
+@media (max-width: 760px) {
+.login-page {
+grid-template-columns: 1fr;
+}
+
+.login-form-side {
+min-height: auto;
+padding: 25px 23px 20px;
+}
+
+.login-brand {
+font-size: 21px;
+}
+
+.login-form-content {
+max-width: 460px;
+margin: 48px auto;
+}
+
+.login-form-content h1 {
+font-size: clamp(35px, 8vw, 45px);
+}
+
+.login-description {
+font-size: 13px;
+}
+
+.login-copyright {
+padding-top: 5px;
+}
+
+.login-visual-side {
+min-height: auto;
+padding: 0 15px 18px;
+}
+
+.login-visual-frame {
+min-height: 610px;
+padding: 36px 12px 24px;
+border-radius: 22px;
+}
+
+.visual-heading h2 {
+font-size: 34px;
+}
+
+.blood-drop-scene {
+width: 100%;
+max-width: 430px;
+height: 340px;
+margin: 0 auto;
+transform: scale(0.9);
+}
+
+.orbit-one {
+width: 195px;
+height: 195px;
+}
+
+.orbit-two {
+width: 245px;
+height: 245px;
+}
+
+.orbit-three {
+width: 295px;
+height: 295px;
+}
+
+.drop-rays {
+width: 270px;
+height: 270px;
+}
+
+.drop-ray {
+transform: translateX(-50%)
+rotate(calc(var(--ray-index) * 18deg));
+transform-origin: 0 135px;
+}
+
+.main-blood-drop {
+width: 125px;
+height: 158px;
+}
+
+.floating-info-card {
+width: 177px;
+min-height: 68px;
+gap: 8px;
+padding: 10px;
+}
+
+.info-card-icon {
+width: 30px;
+height: 30px;
+font-size: 19px;
+}
+
+.floating-info-card h3 {
+font-size: 10px;
+}
+
+.floating-info-card p {
+font-size: 9px;
+}
+
+.info-card-one {
+top: 5%;
+left: -3px;
+}
+
+.info-card-two {
+top: 42%;
+right: -9px;
+}
+
+.info-card-three {
+bottom: 1%;
+left: -3px;
+}
+
+.visual-footer {
+font-size: 10px;
+}
+}
+
+/* ========================================
+SMALL MOBILE SCREENS
+======================================== */
+
+@media (max-width: 390px) {
+.login-form-side {
+padding-right: 19px;
+padding-left: 19px;
+}
+
+.login-visual-side {
+padding-right: 9px;
+padding-left: 9px;
+}
+
+.login-visual-frame {
+min-height: 560px;
+padding-right: 7px;
+padding-left: 7px;
+}
+
+.visual-heading h2 {
+font-size: 30px;
+}
+
+.blood-drop-scene {
+margin-left: -3%;
+width: 106%;
+transform: scale(0.82);
+}
+
+.floating-info-card {
+width: 160px;
+padding: 8px;
+}
+
+.info-card-two {
+right: -7px;
+}
+}
+
+/* Respect reduced-motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+.main-blood-drop,
+.drop-rays {
+animation: none;
+}
+
+.login-submit {
+transition: none;
+}
+}
+
+
+/* Google Sign-In section */
+.login-google-section {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.login-google-section p {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  color: #777078;
+  font-size: 13px;
+}
+
+.login-google-section p::before,
+.login-google-section p::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eadde0;
+}
+
+.login-google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid #e7d9dc;
+  border-radius: 10px;
+  background: #fff;
+  color: #34272b;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-google-button::before {
+  content: "G";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -45deg,
+    #4285f4 0deg 90deg,
+    #34a853 90deg 180deg,
+    #fbbc05 180deg 270deg,
+    #ea4335 270deg 360deg
+  );
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.login-google-button:hover:not(:disabled) {
+  background: #fff8f8;
+  border-color: #bd4654;
+  box-shadow: 0 4px 12px rgba(114, 23, 36, 0.08);
+}
+
+.login-google-button:focus-visible {
+  outline: 3px solid rgba(184, 61, 74, 0.25);
+  outline-offset: 3px;
+}
+
+.login-google-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-error {
+  margin: 10px 0;
+  color: #b42332;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+
+
+.password-field {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.password-field > label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #54212b;
+}
+
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 70px;
+}
+
+.register-page .login-form > input,
+.register-page .login-form > select.login-input,
+.register-page .password-input-wrap input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 49px;
+  margin-bottom: 0;
+  padding: 0 14px;
+  border: 1px solid var(--login-border);
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: var(--login-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.register-page .password-input-wrap input {
+  padding-right: 70px;
+}
+
+.register-page .password-field {
+  margin-bottom: 0;
+}
+
+.register-page .login-form > input:focus,
+.register-page .login-form > select.login-input:focus,
+.register-page .password-input-wrap input:focus {
+  border-color: var(--login-red);
+  box-shadow: 0 0 0 3px rgb(169 52 67 / 10%);
+}
+
+.register-page .login-form > select.login-input {
+  appearance: none;
+}
+
+.register-page .login-form > label,
+.register-page .password-field > label {
+  line-height: 1.35;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  border: none;
+  background: transparent;
+  color: #8e2638;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.password-toggle-btn:hover {
+  color: #641728;
+}
+
+.password-rules {
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.password-rules > p {
+  margin: 0 0 8px;
+  color: #694b50;
+  font-weight: 600;
+}
+
+.password-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  color: #817277;
+  transition: color 0.2s ease;
+}
+
+.password-rule.rule-valid,
+.password-match.rule-valid {
+  color: #218653;
+}
+
+.password-match.rule-invalid {
+  color: #b42332;
+}
+
+.password-match {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+
+.role-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 86px;
+  padding: 10px 5px;
+  border: 1px solid var(--login-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--login-text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.role-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.role-option.selected {
+  border-color: var(--login-red);
+  background: #fff3f2;
+  color: var(--login-burgundy);
+}
+
+.role-option:focus-within {
+  outline: 2px solid var(--login-red);
+  outline-offset: 2px;
+}
+
+.role-icon {
+  font-size: 22px;
+}
+
+
+
+
+/* Tighten the registration illustration on desktop */
+/* Balanced registration illustration — desktop */
+@media (min-width: 901px) {
+  .register-page .login-visual-frame {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 28px 18px 18px;
+  }
+
+  .register-page .visual-heading {
+    flex-shrink: 0;
+  }
+
+  .register-page .blood-drop-scene {
+    flex: 1;
+    width: 100%;
+    min-height: 320px;
+    height: auto;
+    margin: 0;
+  }
+
+  .register-page .floating-info-card {
+    width: 190px;
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  /* Left side */
+  .register-page .info-card-one {
+    top: 8%;
+    left: 10%;
+  }
+
+  .register-page .info-card-three {
+    top: 55%;
+    bottom: auto;
+    left: 10%;
+  }
+
+  /* Right side */
+  .register-page .info-card-two {
+    top: 18%;
+    right: 10%;
+  }
+
+  .register-page .info-card-four {
+    top: 300%;
+    right: -150%;
+    left: auto;
+  }
+
+  /* Center bottom */
+  .register-page .info-card-five {
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .register-page .visual-footer {
+    flex-shrink: 0;
+    margin-top: 0;
+  }
+}
+
+/* Tablet: use the mobile registration layout */
+@media (min-width: 761px) and (max-width: 900px) {
+  .register-page {
+    grid-template-columns: 1fr;
+  }
+
+  .register-page .login-visual-side {
+    order: -1;
+    padding: 16px 20px 0;
+  }
+
+  .register-page .login-visual-frame {
+    min-height: 0;
+    padding: 24px 16px 18px;
+    gap: 12px;
+  }
+
+  .register-page .blood-drop-scene {
+    width: 100%;
+    max-width: 430px;
+    height: 300px;
+    flex: 0 0 300px;
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .register-page .floating-info-card {
+    width: 177px;
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  /* Match the mobile card positions */
+  .register-page .info-card-one {
+    top: 5%;
+    left: 0;
+  }
+
+  .register-page .info-card-two {
+    top: 42%;
+    right: 0;
+  }
+
+  .register-page .info-card-three {
+    bottom: 1%;
+    left: 0;
+  }
+
+  .register-page .info-card-four,
+  .register-page .info-card-five {
+    display: none;
+  }
+
+  .register-page .login-form-side {
+    min-height: auto;
+    padding: 22px clamp(22px, 6vw, 60px) 18px;
+  }
+
+  .register-page .login-form-content {
+    max-width: 500px;
+    margin: 24px auto;
+  }
+}
+
+
+/* ========================================
+   BLOODBRIDGE — VISUAL LEFT, FORM RIGHT
+   Applies to Login and Registration
+======================================== */
+
+.login-page {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.login-page .login-visual-side {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.login-page .login-form-side {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Tablet and mobile: visual panel above the form */
+@media (max-width: 900px) {
+  .login-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login-page .login-visual-side {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .login-page .login-form-side {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+/* Desktop: ensure clean single-viewport presentation without unwanted scrollbars */
+@media (min-width: 901px) {
+  .login-page {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  .login-page .login-form-side {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .login-page .login-form-side::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .login-page .login-visual-side {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+
+
+/* Email verification */
+.email-verification-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #fffaf7;
+}
+
+.email-verification-card {
+  width: min(100%, 460px);
+  padding: 36px 30px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #f0dedd;
+  border-radius: 22px;
+  box-shadow: 0 18px 55px rgba(122, 31, 43, 0.12);
+}
+
+.email-verification-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #f8e7e5;
+  color: #7a1f2b;
+  font-size: 30px;
+}
+
+.email-verification-card h1 {
+  margin-bottom: 14px;
+  color: #7a1f2b;
+}
+
+.email-verification-card p {
+  color: #756868;
+  line-height: 1.65;
+}
+
+.verification-email {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  color: #7a1f2b !important;
+}
+
+.email-verification-card button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #7a1f2b;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.email-verification-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.email-verification-card .verification-secondary-button {
+  background: #f8e7e5;
+  color: #7a1f2b;
+}
+
+.email-verification-card .verification-link-button {
+  background: transparent;
+  color: #756868;
+}
