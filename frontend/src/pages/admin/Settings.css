@@ -1,0 +1,673 @@
+
+.bb-settings-page {
+  --settings-red: #7a1f2b;
+  --settings-red-hover: #641923;
+  --settings-rose: #e8c9c7;
+  --settings-bg: #faf5f2;
+  --settings-card: #fffdfc;
+  --settings-text: #2d2525;
+  --settings-muted: #756868;
+  --settings-border: #e6d8d5;
+  --settings-green: #287647;
+
+  width: 100%;
+  min-width: 0;
+  padding: 28px 32px;
+  color: var(--settings-text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  font-size: 13px;
+}
+
+.bb-settings-page *,
+.bb-settings-page *::before,
+.bb-settings-page *::after {
+  box-sizing: border-box;
+}
+
+.bb-settings-page button,
+.bb-settings-page input,
+.bb-settings-page select {
+  font: inherit;
+}
+
+.bb-settings-page button:focus-visible,
+.bb-settings-page select:focus-visible,
+.bb-settings-page input:focus-visible {
+  outline: 2px solid var(--settings-rose);
+  outline-offset: 3px;
+}
+
+.bb-settings-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 27px;
+}
+
+.bb-settings-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 11px;
+  color: var(--settings-muted);
+  font-size: 11px;
+}
+
+.bb-settings-breadcrumb span {
+  color: var(--settings-rose);
+}
+
+.bb-settings-heading h1 {
+  margin: 0;
+  color: var(--settings-text);
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+}
+
+.bb-settings-heading p {
+  margin: 8px 0 0;
+  color: var(--settings-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.bb-settings-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--settings-border);
+  border-radius: 20px;
+  background: var(--settings-card);
+  color: var(--settings-muted);
+  font-size: 11px;
+}
+
+.bb-settings-status > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--settings-green);
+}
+
+.bb-settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+  gap: 23px;
+}
+
+.bb-settings-nav {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 11px;
+  border: 1px solid var(--settings-border);
+  border-radius: 14px;
+  background: var(--settings-card);
+}
+
+.bb-settings-nav-heading,
+.bb-settings-group-label {
+  color: var(--settings-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.bb-settings-nav-heading {
+  padding: 5px 10px 10px;
+}
+
+.bb-settings-nav-item {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--settings-muted);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.bb-settings-nav-item:hover {
+  background: #faf0ee;
+  color: var(--settings-red);
+}
+
+.bb-settings-nav-item.active {
+  border-color: #eedbd8;
+  background: #f9eae8;
+  color: var(--settings-red);
+  font-weight: 700;
+}
+
+.bb-settings-nav-icon {
+  display: grid;
+  width: 22px;
+  flex-shrink: 0;
+  place-items: center;
+  font-size: 17px;
+}
+
+.bb-settings-nav-arrow {
+  margin-left: auto;
+  font-size: 19px;
+}
+
+.bb-settings-help {
+  margin-top: 19px;
+  padding: 15px 12px;
+  border: 1px solid #ead3d0;
+  border-radius: 11px;
+  background: #fbf0ed;
+}
+
+.bb-settings-help-icon {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--settings-red);
+  font-size: 20px;
+}
+
+.bb-settings-help strong {
+  color: var(--settings-red);
+  font-size: 12px;
+}
+
+.bb-settings-help p {
+  margin: 7px 0 0;
+  color: var(--settings-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.bb-settings-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bb-settings-card {
+  min-width: 0;
+  scroll-margin-top: 100px;
+  padding: 23px;
+  border: 1px solid var(--settings-border);
+  border-radius: 14px;
+  background: var(--settings-card);
+  box-shadow: 0 3px 12px rgb(75 40 40 / 3%);
+}
+
+.bb-settings-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 23px;
+}
+
+.bb-settings-section-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid #efd9d6;
+  border-radius: 12px;
+  background: #fbefed;
+  color: var(--settings-red);
+  font-size: 20px;
+}
+
+.bb-settings-card-heading h2 {
+  margin: 0;
+  color: var(--settings-text);
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.bb-settings-card-heading p {
+  margin: 6px 0 0;
+  color: var(--settings-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.bb-settings-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bb-settings-field > label {
+  color: var(--settings-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bb-settings-field > p,
+.bb-settings-field-hint {
+  margin: 0;
+  color: var(--settings-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.bb-settings-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: var(--settings-border);
+}
+
+.bb-settings-toggle-row {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0e7e4;
+  cursor: pointer;
+}
+
+.bb-settings-toggle-row:last-child {
+  border-bottom: 0;
+}
+
+.bb-settings-toggle-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bb-settings-toggle-copy strong {
+  color: var(--settings-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.bb-settings-toggle-copy > span {
+  color: var(--settings-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.bb-settings-toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.bb-settings-switch {
+  position: relative;
+  display: block;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: #d7cecb;
+  transition: background 160ms ease;
+}
+
+.bb-settings-switch::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.bb-settings-toggle-input:checked + .bb-settings-switch {
+  background: var(--settings-red);
+}
+
+.bb-settings-toggle-input:checked + .bb-settings-switch::after {
+  transform: translateX(16px);
+}
+
+.bb-settings-toggle-input:focus-visible + .bb-settings-switch {
+  outline: 2px solid var(--settings-rose);
+  outline-offset: 3px;
+}
+
+.bb-settings-group-label {
+  margin: 0 0 5px;
+}
+
+.bb-settings-account {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid var(--settings-border);
+  border-radius: 11px;
+  background: #fdf8f6;
+}
+
+.bb-settings-account-avatar {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--settings-rose);
+  color: var(--settings-red);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.bb-settings-account-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bb-settings-account-copy strong {
+  overflow-wrap: anywhere;
+  color: var(--settings-text);
+  font-size: 12px;
+}
+
+.bb-settings-account-copy > span {
+  overflow-wrap: anywhere;
+  color: var(--settings-muted);
+  font-size: 10px;
+}
+
+.bb-settings-account-copy .bb-settings-role {
+  color: var(--settings-red);
+  font-weight: 700;
+}
+
+.bb-settings-auth-badge {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 6px 9px;
+  border-radius: 20px;
+  background: #e8f4eb;
+  color: #246b3c;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.bb-settings-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 17px;
+  padding: 13px;
+  border: 1px solid #eadbd0;
+  border-radius: 9px;
+  background: #fff8ed;
+}
+
+.bb-settings-security-note > span {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #f1e0c6;
+  color: #805b26;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bb-settings-security-note p {
+  margin: 0;
+  color: #765d42;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.bb-settings-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 17px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--settings-border);
+  color: var(--settings-muted);
+  font-size: 11px;
+}
+
+.bb-settings-info-row strong {
+  color: var(--settings-text);
+  font-weight: 650;
+}
+
+.bb-settings-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 17px;
+}
+
+.bb-settings-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--settings-border);
+  border-radius: 8px;
+  background: var(--settings-card);
+  color: var(--settings-text);
+  cursor: pointer;
+}
+
+.bb-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px 0 6px;
+}
+
+.bb-settings-actions > span {
+  color: var(--settings-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.bb-settings-actions > div {
+  display: flex;
+  flex-shrink: 0;
+  gap: 9px;
+}
+
+.bb-settings-reset,
+.bb-settings-save {
+  min-height: 39px;
+  padding: 10px 15px;
+  border: 1px solid var(--settings-border);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.bb-settings-reset {
+  background: var(--settings-card);
+  color: var(--settings-muted);
+}
+
+.bb-settings-reset:hover {
+  border-color: var(--settings-rose);
+  background: #fbf0ee;
+}
+
+.bb-settings-save {
+  border-color: var(--settings-red);
+  background: var(--settings-red);
+  color: white;
+}
+
+.bb-settings-save:hover:not(:disabled) {
+  border-color: var(--settings-red-hover);
+  background: var(--settings-red-hover);
+}
+
+.bb-settings-save:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bb-settings-compact .bb-settings-content {
+  gap: 11px;
+}
+
+.bb-settings-compact .bb-settings-card {
+  padding: 17px;
+}
+
+.bb-settings-compact .bb-settings-card-heading {
+  margin-bottom: 15px;
+}
+
+.bb-settings-compact .bb-settings-toggle-row {
+  padding: 10px 0;
+}
+
+.bb-settings-compact .bb-settings-divider {
+  margin: 13px 0;
+}
+
+@media (max-width: 1100px) {
+  .bb-settings-page {
+    padding: 24px 20px;
+  }
+
+  .bb-settings-layout {
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .bb-settings-card {
+    padding: 19px;
+  }
+}
+
+@media (max-width: 760px) {
+  .bb-settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bb-settings-nav {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .bb-settings-nav-heading {
+    grid-column: 1 / -1;
+  }
+
+  .bb-settings-nav-item {
+    min-width: 0;
+    gap: 7px;
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+
+  .bb-settings-nav-arrow {
+    display: none;
+  }
+
+  .bb-settings-help {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .bb-settings-page {
+    padding: 19px 13px;
+  }
+
+  .bb-settings-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 19px;
+  }
+
+  .bb-settings-heading h1 {
+    font-size: 25px;
+  }
+
+  .bb-settings-card {
+    padding: 16px;
+    border-radius: 11px;
+  }
+
+  .bb-settings-card-heading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .bb-settings-section-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bb-settings-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+  }
+
+  .bb-settings-account {
+    flex-wrap: wrap;
+    padding: 12px;
+  }
+
+  .bb-settings-auth-badge {
+    margin-left: 0;
+  }
+
+  .bb-settings-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bb-settings-actions > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .bb-settings-reset,
+  .bb-settings-save {
+    padding: 10px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-settings-page *,
+  .bb-settings-page *::before,
+  .bb-settings-page *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,125 @@
+.access-denied-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: #faf5f2;
+  color: #2d2525;
+}
+
+.access-denied-card {
+  width: min(100%, 560px);
+  padding: 42px 36px;
+  text-align: center;
+  background: #fffdfc;
+  border: 1px solid #e6d8d5;
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(45, 37, 37, 0.08);
+}
+
+.access-denied-icon {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: #e8c9c7;
+  color: #7a1f2b;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.access-denied-eyebrow {
+  margin: 0 0 8px;
+  color: #7a1f2b;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.access-denied-card h1 {
+  margin: 0;
+  color: #2d2525;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.15;
+}
+
+.access-denied-description {
+  max-width: 460px;
+  margin: 16px auto 0;
+  color: #756868;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.access-denied-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.access-denied-primary,
+.access-denied-secondary {
+  min-width: 120px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.access-denied-primary {
+  border: 1px solid #7a1f2b;
+  background: #7a1f2b;
+  color: #fffdfc;
+}
+
+.access-denied-secondary {
+  border: 1px solid #d7c8c4;
+  background: #fffdfc;
+  color: #2d2525;
+}
+
+.access-denied-primary:hover,
+.access-denied-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.access-denied-primary:focus-visible,
+.access-denied-secondary:focus-visible {
+  outline: 3px solid #e8c9c7;
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .access-denied-page {
+    padding: 20px 16px;
+  }
+
+  .access-denied-card {
+    padding: 32px 22px;
+    border-radius: 16px;
+  }
+
+  .access-denied-actions {
+    flex-direction: column;
+  }
+
+  .access-denied-primary,
+  .access-denied-secondary {
+    width: 100%;
+  }
+}

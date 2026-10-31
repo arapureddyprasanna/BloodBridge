@@ -1,0 +1,38 @@
+.bb-card {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(45, 37, 37, 0.04), 0 4px 12px rgba(45, 37, 37, 0.04);
+  overflow: hidden;
+  transition:
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal),
+    border-color var(--transition-normal);
+}
+
+.bb-card:hover {
+  border-color: #d9a0a5;
+  box-shadow: 0 4px 16px rgba(45, 37, 37, 0.08);
+}
+
+.bb-card-header {
+  padding: var(--space-5) var(--space-6) 0;
+}
+
+.bb-card-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bb-card-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.bb-card-content {
+  padding: var(--space-6);
+}

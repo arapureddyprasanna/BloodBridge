@@ -1,0 +1,64 @@
+.bb-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 26px;
+  padding: 0 10px;
+
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+
+  white-space: nowrap;
+}
+
+/* Default */
+
+.bb-status-default {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+/* Success */
+
+.bb-status-success {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border-color: #c8d8ca;
+}
+
+/* Warning */
+
+.bb-status-warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning);
+  border-color: #eed6b7;
+}
+
+/* Danger */
+
+.bb-status-danger {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: #f0c5c7;
+}
+
+/* Info */
+
+.bb-status-info {
+  background-color: var(--color-info-light);
+  color: var(--color-info);
+  border-color: #d6d4e0;
+}
+
+/* Primary */
+
+.bb-status-primary {
+  background-color: var(--color-accent-soft);
+  color: var(--color-primary);
+  border-color: #e2c0be;
+}

@@ -1,0 +1,17 @@
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+firebaseAcc.json
+
+# Generated and local development files
+__pycache__/
+*.py[cod]
+media/
+.venv/
+venv/
+node_modules/
+build/
+
+# Local database backups
+backend/backups/
