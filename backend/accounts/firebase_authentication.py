@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import firebase_admin
 from firebase_admin import auth, credentials
@@ -27,15 +28,23 @@ def verify_firebase_token(token):
             app = firebase_admin.get_app()
         except ValueError:
             credential_path = Path(settings.BASE_DIR) / "firebaseAcc.json"
+            credential_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
 
-            if not credential_path.is_file():
+            if credential_path.is_file():
+                app = firebase_admin.initialize_app(
+                    credentials.Certificate(str(credential_path))
+                )
+            elif credential_json:
+                import json
+
+                service_account_info = json.loads(credential_json)
+                app = firebase_admin.initialize_app(
+                    credentials.Certificate(service_account_info)
+                )
+            else:
                 raise AuthenticationFailed(
                     "Firebase service-account configuration is missing."
                 )
-
-            app = firebase_admin.initialize_app(
-                credentials.Certificate(str(credential_path))
-            )
 
         return auth.verify_id_token(token, app=app)
 
@@ -43,8 +52,7 @@ def verify_firebase_token(token):
         raise
     except Exception:
         raise AuthenticationFailed("Invalid or expired Firebase token.")
-
-
+    
 class FirebaseTokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         header = request.headers.get("Authorization", "")
