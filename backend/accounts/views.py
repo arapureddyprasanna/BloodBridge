@@ -1,4 +1,3 @@
-import email
 import logging
 import re
 
@@ -606,23 +605,10 @@ class VerificationStatusView(APIView):
         try:
             user = User.objects.get(firebase_uid=uid)
         except User.DoesNotExist:
-            user = None
-
-            if email:
-                user = User.objects.filter(
-                    email__iexact=email
-                ).first()
-
-            if user is None:
-                return Response(
-                   {
-                        "detail": (
-                            "BloodBridge profile not found. "
-                            "Please register."
-                        )
-                    },
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+            return Response(
+                {"detail": "BloodBridge profile not found. Please register."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         # Super Admins are pre-authorized and do not participate in the
         # document verification workflow.
