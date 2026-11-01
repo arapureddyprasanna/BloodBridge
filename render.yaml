@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: bloodbridge-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: bash build.sh
+    startCommand: gunicorn config.wsgi:application
