@@ -665,7 +665,7 @@ class MeView(APIView):
             # Keep read-only profile recovery compatible for
             # verified Firebase identities without changing the
             # account's Firebase UID implicitly.
-            if email and email_verified:
+            if email:
                 try:
                     user = User.objects.get(
                         email__iexact=email
