@@ -106,22 +106,24 @@ class FirebaseUserAuthentication(BaseAuthentication):
             claims.get("email_verified", False)
         )
         try:
-            user = User.objects.get(
-                firebase_uid=firebase_uid
+           user = User.objects.get(
+              firebase_uid=firebase_uid
             )
         except User.DoesNotExist:
-            # Preserve verified-email recovery for existing accounts,
-            # but never change the stored Firebase UID implicitly.
-            user = None
-            if firebase_email and firebase_email_verified:
-                user = User.objects.filter(
-                    email__iexact=firebase_email
-                ).first()
+           # Firebase has already verified the ID token.
+           # Resolve an existing BloodBridge account by its unique email
+           # without changing the stored Firebase UID.
+           user = None
+
+        if firebase_email:
+            user = User.objects.filter(
+               email__iexact=firebase_email
+            ).first()
 
             if user is None:
-                raise AuthenticationFailed(
+               raise AuthenticationFailed(
                     "No BloodBridge account is linked to this Firebase user."
-                )
+               )
 
         if not user.is_active:
             raise AuthenticationFailed(
