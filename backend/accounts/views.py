@@ -655,64 +655,174 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        uid = (request.auth.get("uid") or "").strip()
-
+        uid = request.auth.get("uid")
         email = (
             request.auth.get("email") or ""
         ).strip().lower()
 
         email_verified = bool(
-            request.auth.get("email_verified", False)
+            request.auth.get(
+                "email_verified",
+                False,
+            )
         )
 
-        # If the ID token does not expose the email claim as expected,
-        # resolve the Firebase user directly from the verified UID.
-        if not email and uid:
-            try:
-                firebase_user = auth.get_user(uid)
-                email = (
-                    firebase_user.email or ""
-                ).strip().lower()
-                email_verified = bool(
-                    firebase_user.email_verified
-                )
-            except Exception:
-                pass
-
-        user = None
-
-        # Primary lookup.
-        if uid:
-            user = User.objects.filter(
+        try:
+            user = User.objects.get(
                 firebase_uid=uid
-            ).first()
-
-        # Production-safe recovery for an already-existing account.
-        # This does NOT modify/rebind firebase_uid.
-        if user is None and email:
-            user = User.objects.filter(
-                email__iexact=email
-            ).first()
-
-        if user is None:
-            return Response(
-                {
-                    "detail": (
-                        "BloodBridge profile not found. "
-                        "Please register."
-                    )
-                },
-                status=status.HTTP_404_NOT_FOUND,
             )
 
-        if user.email_verified != email_verified:
-            user.email_verified = email_verified
+        except User.DoesNotExist:
+
+            user = None
+
+            # Keep read-only profile recovery compatible for
+            # verified Firebase identities without changing the
+            # account's Firebase UID implicitly.
+            if email:
+                try:
+                    user = User.objects.get(
+                        email__iexact=email
+                    )
+                except User.DoesNotExist:
+                    user = None
+
+            if user is None:
+                return Response(
+                    {
+                        "detail": (
+                            "BloodBridge profile not found. "
+                            "Please register."
+                        )
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        firebase_verified = email_verified
+
+        if (
+            user.email_verified
+            != firebase_verified
+        ):
+            user.email_verified = firebase_verified
             user.save(
                 update_fields=[
                     "email_verified",
                     "updated_at",
                 ]
             )
+
+        return Response(
+            profile_data(
+                user,
+                uid,
+                request,
+            )
+        )
+
+    def patch(self, request):
+        uid = request.auth.get("uid")
+        email = (
+            request.auth.get("email") or ""
+        ).strip().lower()
+        email_verified = bool(
+            request.auth.get("email_verified", False)
+        )
+
+        try:
+            user = User.objects.get(
+                firebase_uid=uid
+            )
+        except User.DoesNotExist:
+            user = None
+            if email and email_verified:
+                user = User.objects.filter(
+                    email__iexact=email
+                ).first()
+
+            if user is None:
+                return Response(
+                    {
+                        "detail": (
+                            "BloodBridge profile not found. "
+                            "Please register."
+                        )
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        full_name = request.data.get(
+            "full_name"
+        )
+        phone = request.data.get("phone")
+        latitude = request.data.get("latitude")
+        longitude = request.data.get("longitude")
+
+        if full_name is not None:
+            if (
+                not isinstance(
+                    full_name,
+                    str,
+                )
+                or not full_name.strip()
+            ):
+                return Response(
+                    {
+                        "detail": (
+                            "full_name cannot be empty."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user.full_name = full_name.strip()
+
+        if phone is not None:
+            if (
+                not isinstance(
+                    phone,
+                    str,
+                )
+                or not phone.strip()
+            ):
+                return Response(
+                    {
+                        "detail": (
+                            "phone cannot be empty."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user.mobile_number = phone.strip()
+
+        if latitude is not None or longitude is not None:
+            if user.role != User.Role.HOSPITAL_ADMIN:
+                return Response({"detail": "Only hospital administrators can update hospital coordinates."}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                hospital_profile = user.hospital_profile
+            except HospitalProfile.DoesNotExist:
+                return Response({"detail": "Hospital profile not found."}, status=status.HTTP_404_NOT_FOUND)
+            values = {}
+            for field, value, minimum, maximum in (
+                ("latitude", latitude, -90, 90),
+                ("longitude", longitude, -180, 180),
+            ):
+                if value is None:
+                    continue
+                try:
+                    number = float(value)
+                except (TypeError, ValueError):
+                    return Response({"detail": f"{field} must be a valid number."}, status=status.HTTP_400_BAD_REQUEST)
+                if not minimum <= number <= maximum:
+                    return Response({"detail": f"{field} is outside the valid range."}, status=status.HTTP_400_BAD_REQUEST)
+                values[field] = number
+            for field, value in values.items():
+                setattr(hospital_profile, field, value)
+            hospital_profile.location_updated_at = timezone.now()
+            hospital_profile.save(update_fields=[*values, "location_updated_at", "updated_at"])
+
+        user.save()
 
         return Response(
             profile_data(
