@@ -1,5 +1,11 @@
 import { API_BASE_URL } from "../../api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase";
 
@@ -35,8 +41,26 @@ function PendingVerification() {
   const [replacementMode, setReplacementMode] = useState(false);
 
   /*
+   * Prevent overlapping verification requests.
+   */
+  const statusCheckInProgress = useRef(false);
+
+  /*
+   * Prevent duplicate navigation/toast decisions.
+   */
+  const navigationHandled = useRef(false);
+
+  /*
    * ---------------------------------------------------------
    * TOKEN
+   * ---------------------------------------------------------
+   *
+   * IMPORTANT:
+   *
+   * Do NOT force-refresh the Firebase token here.
+   *
+   * getIdToken() allows Firebase to reuse the current valid
+   * token and refresh it only when necessary.
    * ---------------------------------------------------------
    */
 
@@ -51,7 +75,7 @@ function PendingVerification() {
       return null;
     }
 
-    return user.getIdToken(true);
+    return user.getIdToken();
   }
 
   /*
@@ -59,269 +83,290 @@ function PendingVerification() {
    * LOAD VERIFICATION STATUS
    * ---------------------------------------------------------
    *
-   * IMPORTANT STATE RULE:
+   * Application state controls navigation.
    *
    * submitted / under_review
-   *      -> STAY ON THIS PAGE
+   *      -> stay on this page
    *
-   * approved
-   *      -> dashboard
+   * approved + active
+   *      -> role dashboard
    *
-   * whole application rejected
+   * rejected application
    *      -> documents page
    *
-   * draft
+   * draft and not submitted
    *      -> documents page
    *
-   * Individual document rejection DOES NOT change the
-   * application into a rejected state.
+   * Individual document rejection
+   *      -> stay on this page and allow replacement
    * ---------------------------------------------------------
    */
 
-  const loadStatus = useCallback(async (showFeedback = false) => {
-    try {
-      if (showFeedback) {
-        setChecking(true);
-      }
-
-      setError("");
-
-      const user = auth.currentUser;
-
-      if (!user) {
-        navigate("/login", {
-          replace: true,
-        });
-
+  const loadStatus = useCallback(
+    async (showFeedback = false) => {
+      if (statusCheckInProgress.current) {
         return;
       }
 
-      const token = await user.getIdToken(true);
+      statusCheckInProgress.current = true;
 
-      const response = await fetch(
-        `${API_BASE_URL}/auth/verification/`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+      try {
+        if (showFeedback) {
+          setChecking(true);
         }
-      );
 
-      const data = await response
-        .json()
-        .catch(() => ({}));
+        setError("");
 
-      if (!response.ok) {
-        throw new Error(
-          data.detail ||
-            "Unable to check your verification status."
-        );
-      }
+        const user = auth.currentUser;
 
-      /*
-       * Super Admin accounts do not need verification.
-       */
-      if (data.verification_required === false) {
-        navigate("/admin", {
-          replace: true,
-        });
-
-        return;
-      }
-
-      const currentVerification =
-        data.verification || {};
-
-      const currentRole = data.role || "";
-      const currentAccountStatus =
-        data.account_status || "";
-
-      const currentStatus =
-        currentVerification.status || "";
-
-      /*
-       * Store the latest server state first.
-       */
-      setVerification(currentVerification);
-      setAccountStatus(currentAccountStatus);
-      setRole(currentRole);
-
-      /*
-       * -------------------------------------------------------
-       * APPROVED
-       * -------------------------------------------------------
-       */
-
-      if (
-        currentStatus === "approved" &&
-        currentAccountStatus === "active"
-      ) {
-        const routes = {
-          hospital_admin: "/hospital",
-          community_admin: "/community",
-          donor: "/donor/dashboard",
-        };
-
-        showToast(
-          "Your BloodBridge account has been approved!",
-          "success"
-        );
-
-        navigate(
-          routes[currentRole] || "/",
-          {
+        if (!user) {
+          navigate("/login", {
             replace: true,
-          }
-        );
+          });
 
-        return;
-      }
+          return;
+        }
 
-      /*
-       * -------------------------------------------------------
-       * WHOLE APPLICATION REJECTED
-       * -------------------------------------------------------
-       *
-       * This is different from a rejected document.
-       *
-       * The verification application itself must be rejected
-       * before we send the applicant back to the editable
-       * verification documents page.
-       * -------------------------------------------------------
-       */
+        /*
+         * IMPORTANT:
+         *
+         * Normal token retrieval.
+         *
+         * Do not use:
+         * user.getIdToken(true)
+         *
+         * because that forces a Secure Token refresh.
+         */
+        const token = await user.getIdToken();
 
-      if (currentStatus === "rejected") {
-        navigate(
-          "/verification/documents",
+        const response = await fetch(
+          `${API_BASE_URL}/auth/verification/`,
           {
-            replace: true,
-            state: {
-              rejected: true,
-              rejectionReason:
-                currentVerification.rejection_reason ||
-                "",
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
 
-        return;
-      }
+        const data = await response
+          .json()
+          .catch(() => ({}));
 
-      /*
-       * -------------------------------------------------------
-       * DRAFT
-       * -------------------------------------------------------
-       *
-       * Only a genuinely unsubmitted application should return
-       * to the editable documents page.
-       *
-       * If the server says submitted/under_review, we NEVER
-       * redirect to documents.
-       * -------------------------------------------------------
-       */
-
-      if (
-        currentStatus === "draft" &&
-        !currentVerification.submitted_at
-      ) {
-        navigate(
-          "/verification/documents",
-          {
-            replace: true,
-          }
-        );
-
-        return;
-      }
-
-      /*
-       * -------------------------------------------------------
-       * SUBMITTED / UNDER REVIEW
-       * -------------------------------------------------------
-       *
-       * This is the important fix.
-       *
-       * Regardless of individual document statuses, the
-       * application remains on the pending page while the
-       * application itself is submitted or under review.
-       * -------------------------------------------------------
-       */
-
-      if (
-        currentStatus === "submitted" ||
-        currentStatus === "under_review"
-      ) {
-        if (showFeedback) {
-          const hasRejectedDocument =
-            currentVerification.requirements?.some(
-              (document) =>
-                document.required &&
-                document.status === "rejected"
-            );
-
-          showToast(
-            hasRejectedDocument
-              ? "The corrected document has been submitted for review."
-              : "Your verification is still under review.",
-            "success"
+        if (!response.ok) {
+          throw new Error(
+            data.detail ||
+            "Unable to check your verification status."
           );
         }
 
-        return;
-      }
+        /*
+         * Super Admin accounts do not need verification.
+         */
+        if (data.verification_required === false) {
+          if (!navigationHandled.current) {
+            navigationHandled.current = true;
 
-      /*
-       * -------------------------------------------------------
-       * FALLBACK
-       * -------------------------------------------------------
-       *
-       * Do not redirect to documents merely because a document
-       * is pending. The application state controls navigation.
-       * -------------------------------------------------------
-       */
+            navigate("/admin", {
+              replace: true,
+            });
+          }
 
-      if (showFeedback) {
-        showToast(
-          "Your verification status has been refreshed.",
-          "success"
+          return;
+        }
+
+        const currentVerification =
+          data.verification || {};
+
+        const currentRole = data.role || "";
+
+        const currentAccountStatus =
+          data.account_status || "";
+
+        const currentStatus =
+          currentVerification.status || "";
+
+        /*
+         * Store authoritative server state.
+         */
+        setVerification(currentVerification);
+        setAccountStatus(currentAccountStatus);
+        setRole(currentRole);
+
+        /*
+         * -------------------------------------------------------
+         * APPROVED
+         * -------------------------------------------------------
+         */
+
+        if (
+          currentStatus === "approved" &&
+          currentAccountStatus === "active"
+        ) {
+          /*
+           * Donor verification approval is NOT the final
+           * onboarding step.
+           *
+           * Donors must also complete community approval.
+           * Therefore, never automatically send a donor
+           * from the community-review page to the dashboard.
+           */
+          if (currentRole === "donor") {
+            return;
+          }
+
+          const routes = {
+            hospital_admin: "/hospital",
+            community_admin: "/community",
+          };
+
+          if (!navigationHandled.current) {
+            navigationHandled.current = true;
+
+            showToast(
+              "Your BloodBridge account has been approved!",
+              "success"
+            );
+
+            navigate(
+              routes[currentRole] || "/",
+              {
+                replace: true,
+              }
+            );
+          }
+
+          return;
+        }
+        /*
+         * -------------------------------------------------------
+         * WHOLE APPLICATION REJECTED
+         * -------------------------------------------------------
+         *
+         * This is different from an individual rejected
+         * document.
+         * -------------------------------------------------------
+         */
+
+        if (currentStatus === "rejected") {
+          if (!navigationHandled.current) {
+            navigationHandled.current = true;
+
+            navigate(
+              "/verification/documents",
+              {
+                replace: true,
+                state: {
+                  rejected: true,
+                  rejectionReason:
+                    currentVerification.rejection_reason ||
+                    "",
+                },
+              }
+            );
+          }
+
+          return;
+        }
+
+        /*
+         * -------------------------------------------------------
+         * DRAFT
+         * -------------------------------------------------------
+         */
+
+        if (
+          currentStatus === "draft" &&
+          !currentVerification.submitted_at
+        ) {
+          if (!navigationHandled.current) {
+            navigationHandled.current = true;
+
+            navigate(
+              "/verification/documents",
+              {
+                replace: true,
+              }
+            );
+          }
+
+          return;
+        }
+
+        /*
+         * -------------------------------------------------------
+         * SUBMITTED / UNDER REVIEW
+         * -------------------------------------------------------
+         */
+
+        if (
+          currentStatus === "submitted" ||
+          currentStatus === "under_review"
+        ) {
+          if (showFeedback) {
+            const hasRejectedDocument =
+              currentVerification.requirements?.some(
+                (document) =>
+                  document.required &&
+                  document.status === "rejected"
+              );
+
+            showToast(
+              hasRejectedDocument
+                ? "The corrected document has been submitted for review."
+                : "Your verification is still under review.",
+              "success"
+            );
+          }
+
+          return;
+        }
+
+        /*
+         * -------------------------------------------------------
+         * FALLBACK
+         * -------------------------------------------------------
+         */
+
+        if (showFeedback) {
+          showToast(
+            "Your verification status has been refreshed.",
+            "success"
+          );
+        }
+      } catch (err) {
+        console.error(
+          "Verification status check failed:",
+          err
         );
-      }
-    } catch (err) {
-      console.error(
-        "Verification status check failed:",
-        err
-      );
 
-      setError(
-        err.message ||
+        setError(
+          err.message ||
           "Unable to check your verification status."
-      );
-    } finally {
-      setLoading(false);
-      setChecking(false);
-    }
-  }, [navigate]);
+        );
+      } finally {
+        statusCheckInProgress.current = false;
+        setLoading(false);
+        setChecking(false);
+      }
+    },
+    [navigate]
+  );
 
   /*
    * ---------------------------------------------------------
-   * AUTH LISTENER
+   * INITIAL STATUS CHECK
    * ---------------------------------------------------------
    */
 
   useEffect(() => {
-  loadStatus();
-}, [loadStatus]);
+    loadStatus();
+  }, [loadStatus]);
 
   /*
    * ---------------------------------------------------------
    * REJECTED DOCUMENTS
-   * ---------------------------------------------------------
-   *
-   * Individual rejected documents are handled here.
-   * They do NOT mean the whole verification application
-   * is rejected.
    * ---------------------------------------------------------
    */
 
@@ -427,14 +472,12 @@ function PendingVerification() {
       if (!response.ok) {
         throw new Error(
           data.detail ||
-            "Unable to upload the replacement document."
+          "Unable to upload the replacement document."
         );
       }
 
       /*
-       * Do not assume the upload response contains the complete
-       * verification object. Always refresh the authoritative
-       * server state after replacement.
+       * Refresh authoritative server state.
        */
       await loadStatus();
 
@@ -442,7 +485,7 @@ function PendingVerification() {
 
       showToast(
         data.message ||
-          "Replacement document uploaded successfully. It is now waiting for review.",
+        "Replacement document uploaded successfully. It is now waiting for review.",
         "success"
       );
     } catch (err) {
@@ -453,7 +496,7 @@ function PendingVerification() {
 
       showToast(
         err.message ||
-          "Unable to upload the replacement document.",
+        "Unable to upload the replacement document.",
         "error"
       );
     } finally {
@@ -519,10 +562,6 @@ function PendingVerification() {
   return (
     <main className="verification-page">
       <section className="verification-shell">
-        {/* =================================================
-            HEADER
-        ================================================= */}
-
         <header className="verification-header">
           <div>
             <span className="verification-eyebrow">
@@ -550,10 +589,6 @@ function PendingVerification() {
                 : "Submitted"}
           </div>
         </header>
-
-        {/* =================================================
-            MAIN STATUS CARD
-        ================================================= */}
 
         <section className="verification-pending-card">
           <div className="verification-pending-icon">
@@ -590,10 +625,6 @@ function PendingVerification() {
             )}
           </div>
         </section>
-
-        {/* =================================================
-            REJECTED DOCUMENTS
-        ================================================= */}
 
         {hasRejectedDocuments && (
           <section className="verification-pending-card">
@@ -772,10 +803,6 @@ function PendingVerification() {
           </section>
         )}
 
-        {/* =================================================
-            TIMELINE
-        ================================================= */}
-
         <section className="verification-timeline">
           <div className="verification-timeline-item complete">
             <div className="verification-timeline-marker">
@@ -825,7 +852,9 @@ function PendingVerification() {
 
             <div>
               <strong>
-                {role === "donor" ? "Community review" : "Super Admin review"}
+                {role === "donor"
+                  ? "Community review"
+                  : "Super Admin review"}
               </strong>
 
               <span>
@@ -847,7 +876,9 @@ function PendingVerification() {
 
             <div>
               <strong>
-                {role === "donor" ? "Community approval" : "Account approval"}
+                {role === "donor"
+                  ? "Community approval"
+                  : "Account approval"}
               </strong>
 
               <span>
@@ -857,10 +888,6 @@ function PendingVerification() {
             </div>
           </div>
         </section>
-
-        {/* =================================================
-            INFO
-        ================================================= */}
 
         <section className="verification-info-grid">
           <article>
@@ -886,7 +913,7 @@ function PendingVerification() {
               {accountStatus === "pending"
                 ? "Pending Approval"
                 : accountStatus ||
-                  "Pending"}
+                "Pending"}
             </strong>
           </article>
 
@@ -901,10 +928,6 @@ function PendingVerification() {
             </strong>
           </article>
         </section>
-
-        {/* =================================================
-            ERROR
-        ================================================= */}
 
         {error && (
           <div className="verification-alert verification-alert-danger">
@@ -924,10 +947,6 @@ function PendingVerification() {
           </div>
         )}
 
-        {/* =================================================
-            REFRESH
-        ================================================= */}
-
         <div className="verification-pending-actions">
           <button
             type="button"
@@ -942,10 +961,6 @@ function PendingVerification() {
               : "Check verification status"}
           </button>
         </div>
-
-        {/* =================================================
-            FOOTER
-        ================================================= */}
 
         <footer className="verification-footer">
           <span className="verification-footer-dot" />
