@@ -194,10 +194,25 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
+SUPABASE_SERVICE_ROLE_KEY = os.getenv(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "",
+).strip()
+SUPABASE_STORAGE_BUCKET = os.getenv(
+    "SUPABASE_STORAGE_BUCKET",
+    "bloodbridge-media",
+).strip()
+
+if IS_PRODUCTION:
+    DEFAULT_STORAGE_BACKEND = "config.supabase_storage.SupabaseStorage"
+else:
+    DEFAULT_STORAGE_BACKEND = "django.core.files.storage.FileSystemStorage"
+
 
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": DEFAULT_STORAGE_BACKEND,
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
