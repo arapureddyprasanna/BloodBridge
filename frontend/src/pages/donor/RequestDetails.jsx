@@ -1,10 +1,6 @@
 import { API_BASE_URL } from "../../api";
 import { useCallback, useEffect, useState } from "react";
-import {
-  Link,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { auth } from "../../firebase";
 import { showToast } from "../../App";
 import {
@@ -24,8 +20,7 @@ export default function DonorRequestDetail() {
 
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [responding, setResponding] =
-    useState(false);
+  const [responding, setResponding] = useState(false);
 
   const loadRequest = useCallback(async () => {
     try {
@@ -50,27 +45,20 @@ export default function DonorRequestDetail() {
         }
       );
 
-      const data = await response
-        .json()
-        .catch(() => ({}));
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
-          data.detail ||
-            "Unable to load invitation details."
+          data.detail || "Unable to load invitation details."
         );
       }
 
       setRequest(data);
     } catch (error) {
-      console.error(
-        "Request details load failed:",
-        error
-      );
+      console.error("Request details load failed:", error);
 
       showToast(
-        error.message ||
-          "Unable to load request details.",
+        error.message || "Unable to load request details.",
         "error"
       );
     } finally {
@@ -86,10 +74,7 @@ export default function DonorRequestDetail() {
     const user = auth.currentUser;
 
     if (!user) {
-      showToast(
-        "Please sign in again to continue.",
-        "error"
-      );
+      showToast("Please sign in again to continue.", "error");
       return;
     }
 
@@ -109,9 +94,7 @@ export default function DonorRequestDetail() {
         }
       );
 
-      const data = await response
-        .json()
-        .catch(() => ({}));
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
@@ -121,16 +104,14 @@ export default function DonorRequestDetail() {
       }
 
       showToast(
-        data.detail ||
-          "Invitation response saved.",
+        data.detail || "Invitation response saved.",
         "success"
       );
 
       await loadRequest();
     } catch (error) {
       showToast(
-        error.message ||
-          "Unable to save your response.",
+        error.message || "Unable to save your response.",
         "error"
       );
     } finally {
@@ -172,10 +153,7 @@ export default function DonorRequestDetail() {
     );
   }
 
-  const status = String(
-    request.status || "pending"
-  ).toLowerCase();
-
+  const status = String(request.status || "pending").toLowerCase();
   const isPending = status === "pending";
 
   const requestCode = String(
@@ -183,6 +161,14 @@ export default function DonorRequestDetail() {
   )
     .slice(0, 8)
     .toUpperCase();
+
+  const hospitalName =
+    request.hospital_name || request.hospital || "Hospital";
+
+  const hospitalLocation =
+    [request.hospital_city, request.hospital_state]
+      .filter(Boolean)
+      .join(", ") || "Location unavailable";
 
   return (
     <div className="bb-page-shell">
@@ -197,9 +183,7 @@ export default function DonorRequestDetail() {
       <section className="bb-donor-detail-hero">
         <div className="bb-donor-detail-hero-blood">
           <span>Blood group</span>
-          <strong>
-            {request.blood_group || "—"}
-          </strong>
+          <strong>{request.blood_group || "—"}</strong>
         </div>
 
         <div className="bb-donor-detail-hero-copy">
@@ -207,21 +191,9 @@ export default function DonorRequestDetail() {
             HOSPITAL INVITATION
           </span>
 
-          <h2>
-            {request.hospital_name ||
-              request.hospital ||
-              "Hospital"}
-          </h2>
+          <h2>{hospitalName}</h2>
 
-          <p>
-            {[
-              request.hospital_city,
-              request.hospital_state,
-            ]
-              .filter(Boolean)
-              .join(", ") ||
-              "Hospital location not provided"}
-          </p>
+          <p>{hospitalLocation}</p>
         </div>
 
         <div className="bb-donor-detail-hero-status">
@@ -243,40 +215,34 @@ export default function DonorRequestDetail() {
               </h2>
 
               <p className="bb-card-description">
-                The information the hospital provided
-                for this blood request.
+                Review the requirements provided by the
+                hospital before responding.
               </p>
             </div>
+
+            <StatusBadge status={status} />
           </div>
 
           <div className="bb-donor-detail-info-grid">
             <div className="bb-donor-detail-info-item bb-donor-detail-info-item--blood">
               <span>Blood group</span>
-              <strong>
-                {request.blood_group || "—"}
-              </strong>
+              <strong>{request.blood_group || "—"}</strong>
             </div>
 
             <div className="bb-donor-detail-info-item">
               <span>Units required</span>
-              <strong>
-                {request.units_required || "—"}
-              </strong>
+              <strong>{request.units_required || "—"}</strong>
             </div>
 
             <div className="bb-donor-detail-info-item">
               <span>Urgency</span>
-              <strong>
-                {request.urgency || "Standard"}
-              </strong>
+              <strong>{request.urgency || "Standard"}</strong>
             </div>
 
             <div className="bb-donor-detail-info-item">
               <span>Required by</span>
               <strong>
-                {formatDateTime(
-                  request.required_by
-                )}
+                {formatDateTime(request.required_by)}
               </strong>
             </div>
 
@@ -292,9 +258,7 @@ export default function DonorRequestDetail() {
             <div className="bb-donor-detail-info-item">
               <span>Invitation sent</span>
               <strong>
-                {formatDateTime(
-                  request.selected_at
-                )}
+                {formatDateTime(request.selected_at)}
               </strong>
             </div>
           </div>
@@ -308,10 +272,12 @@ export default function DonorRequestDetail() {
               </span>
 
               <h2 className="bb-card-title">
-                {request.hospital_name ||
-                  request.hospital ||
-                  "Hospital"}
+                {hospitalName}
               </h2>
+
+              <p className="bb-card-description">
+                Location information for this request.
+              </p>
             </div>
           </div>
 
@@ -321,15 +287,7 @@ export default function DonorRequestDetail() {
             </span>
 
             <div>
-              <strong>
-                {[
-                  request.hospital_city,
-                  request.hospital_state,
-                ]
-                  .filter(Boolean)
-                  .join(", ") ||
-                  "Location unavailable"}
-              </strong>
+              <strong>{hospitalLocation}</strong>
 
               <span>
                 {request.distance_km != null
@@ -382,9 +340,7 @@ export default function DonorRequestDetail() {
               type="button"
               className="bb-secondary-button bb-donor-decline-button"
               disabled={responding}
-              onClick={() =>
-                respond("decline")
-              }
+              onClick={() => respond("decline")}
             >
               {responding
                 ? "Updating..."
@@ -395,9 +351,7 @@ export default function DonorRequestDetail() {
               type="button"
               className="bb-primary-button"
               disabled={responding}
-              onClick={() =>
-                respond("accept")
-              }
+              onClick={() => respond("accept")}
             >
               {responding
                 ? "Updating..."
@@ -406,18 +360,18 @@ export default function DonorRequestDetail() {
           </div>
         )}
 
-        {!isPending &&
-          request.responded_at && (
-            <span className="bb-donor-response-date">
-              Responded{" "}
-              {formatDate(
-                request.responded_at
-              )}
-            </span>
-          )}
+        {!isPending && request.responded_at && (
+          <span className="bb-donor-response-date">
+            Responded {formatDate(request.responded_at)}
+          </span>
+        )}
       </section>
 
       <div className="bb-page-actions">
+        <span>
+          Request #{requestCode}
+        </span>
+
         <Link
           className="bb-secondary-button"
           to="/donor/requests"

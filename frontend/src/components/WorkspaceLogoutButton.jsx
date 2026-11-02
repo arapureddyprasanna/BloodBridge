@@ -7,6 +7,7 @@ export default function WorkspaceLogoutButton({ onLogout, className = "bb-admin-
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     if (!showConfirm) return;
@@ -46,14 +47,34 @@ export default function WorkspaceLogoutButton({ onLogout, className = "bb-admin-
 
   return (
     <>
+
       <button
         type="button"
         className={className}
         onClick={handleOpenConfirm}
         disabled={busy}
         aria-haspopup="dialog"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          marginTop: "12px",
+          transition: "all 0.2s ease",
+          backgroundColor: hovered ? "black" : "rgba(251, 111, 111, 0.99)",
+          color: hovered ? "#FFFFFF" : "#52171f",
+          transform: hovered ? "translateY(-1px)" : "translateY(0)",
+        }}
       >
-        <span className="bb-admin-nav-icon" aria-hidden="true">↪</span>
+        <span
+          aria-hidden="true"
+          style={{
+            color: hovered ? "#FFFFFF" : "#7A1F2B",
+            fontWeight: 800,
+            transition: "color 0.2s ease",
+          }}
+        >
+          ↪
+        </span>
+
         <span>Logout</span>
       </button>
 

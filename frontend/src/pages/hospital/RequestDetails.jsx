@@ -313,12 +313,7 @@ export default function RequestDetails() {
       );
   }, [donations]);
 
-  const remainingUnits = Math.max(
-    Number(request?.units_required || 0) -
-      completedUnits -
-      scheduledUnits,
-    0
-  );
+
 
   const completedRemainingUnits = Math.max(
     Number(request?.units_required || 0) -

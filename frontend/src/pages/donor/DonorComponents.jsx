@@ -212,64 +212,160 @@ export function FilterBar({
   );
 }
 
-export function RequestCard({ request, onAccept, onDecline, busy = false }) {
-  const normalizedStatus = String(request?.status || request?.invitation_status || "awaiting").toLowerCase();
-  const requestId = request?.request_id || request?.id || request?.blood_request_id || "N/A";
-  const hospital = request?.hospital_name || request?.hospital || "Hospital";
-  const bloodGroup = request?.blood_group || request?.bloodGroup || "Blood group not set";
-  const urgency = request?.urgency || request?.priority || "normal";
-  const unitsNeeded = request?.units_needed ?? request?.units_required ?? request?.units ?? "—";
-  const compatibility = request?.compatibility || request?.match_score || "Review required";
-  const requiredBy = request?.required_by || request?.requiredDate || request?.required_at || null;
-  const distance = request?.distance_km ?? request?.distance ?? null;
-  const statusLabels = { pending: "Awaiting", accepted: "Accepted", declined: "Declined", expired: "Expired", cancelled: "Cancelled" };
-  const statusLabel = statusLabels[normalizedStatus] || normalizedStatus.replaceAll("_", " ");
+export function RequestCard({
+  request,
+  onAccept,
+  onDecline,
+  busy = false,
+}) {
+  const normalizedStatus = String(
+    request?.status ||
+      request?.invitation_status ||
+      "awaiting"
+  ).toLowerCase();
+
+  const requestId =
+    request?.request_id ||
+    request?.id ||
+    request?.blood_request_id ||
+    "N/A";
+
+  const hospital =
+    request?.hospital_name ||
+    request?.hospital ||
+    "Hospital";
+
+  const bloodGroup =
+    request?.blood_group ||
+    request?.bloodGroup ||
+    "Blood group not set";
+
+  const urgency =
+    request?.urgency ||
+    request?.priority ||
+    "normal";
+
+  const unitsNeeded =
+    request?.units_needed ??
+    request?.units_required ??
+    request?.units ??
+    "—";
+
+  const compatibility =
+    request?.compatibility ||
+    request?.match_score ||
+    "Review required";
+
+  const requiredBy =
+    request?.required_by ||
+    request?.requiredDate ||
+    request?.required_at ||
+    null;
+
+  const distance =
+    request?.distance_km ??
+    request?.distance ??
+    null;
+
+  const statusLabels = {
+    pending: "Awaiting",
+    accepted: "Accepted",
+    declined: "Declined",
+    expired: "Expired",
+    cancelled: "Cancelled",
+  };
+
+  const statusLabel =
+    statusLabels[normalizedStatus] ||
+    normalizedStatus.replaceAll("_", " ");
+
   const canRespond = normalizedStatus === "pending";
+
+  const requestCode = String(requestId)
+    .slice(0, 8)
+    .toUpperCase();
 
   return (
     <article className="bb-request-card">
       <header className="bb-request-card-header">
         <div>
-          <p className="bb-request-card-label">Request #{String(requestId).slice(0, 8).toUpperCase()}</p>
+          <p className="bb-request-card-label">
+            BLOOD REQUEST · #{requestCode}
+          </p>
+
           <h3>{hospital}</h3>
+
+          <p className="bb-card-description">
+            Hospital invitation requiring your response.
+          </p>
         </div>
+
         <StatusBadge status={statusLabel} />
       </header>
 
       <div className="bb-request-card-body">
         <div className="bb-request-metadata">
-          <span>{bloodGroup}</span>
-          <span>{urgency}</span>
-          <span>{unitsNeeded} units needed</span>
+          <strong><span>{bloodGroup} </span>
+          <span>{urgency}</span></strong><br></br>
+          <span> units needed -<strong>{unitsNeeded}</strong></span>
         </div>
 
         <div className="bb-request-details-grid">
           <div>
-            <small>Compatibility</small>
+            <small>Compatibility -</small>
             <strong>{compatibility}</strong>
           </div>
+
           <div>
-            <small>Required</small>
-            <strong>{formatDateTime(requiredBy)}</strong>
+            <small>Required by -</small>
+            <strong>
+              {formatDateTime(requiredBy)}
+            </strong>
           </div>
+
           <div>
-            <small>Distance</small>
-            <strong>{distance !== null ? `${distance} km` : "Location not shared"}</strong>
+            <small>Distance -</small>
+            <strong>
+              {distance !== null
+                ? `${distance} km`
+                : "Location not shared"}
+            </strong>
           </div>
         </div>
       </div>
 
       <div className="bb-request-card-actions">
-        {canRespond && <>
-          <button type="button" className="bb-secondary-button" disabled={busy} onClick={() => onDecline?.(request)}>
-            {busy ? "Updating…" : "Decline"}
-          </button>
-          <button type="button" className="bb-primary-button" disabled={busy} onClick={() => onAccept?.(request)}>
-            {busy ? "Updating…" : "Accept"}
-          </button>
-        </>}
-        <Link className="bb-text-button" to={`/donor/requests/${requestId}`}>
-          View Details
+        {canRespond && (
+          <>
+            <button
+              type="button"
+              className="bb-secondary-button"
+              disabled={busy}
+              onClick={() =>
+                onDecline?.(request)
+              }
+            >
+              {busy ? "Updating…" : "Decline"}
+            </button>
+
+            <button
+              type="button"
+              className="bb-primary-button"
+              disabled={busy}
+              onClick={() =>
+                onAccept?.(request)
+              }
+            >
+              {busy ? "Updating…" : "Accept"}
+            </button>
+          </>
+        )}
+
+        <Link
+          className="bb-text-button"
+          to={`/donor/requests/${requestId}`}
+        >
+          View Details →
         </Link>
       </div>
     </article>
