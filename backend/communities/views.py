@@ -59,9 +59,9 @@ logger = logging.getLogger(__name__)
 
 
 DONOR_REQUIRED_DOCUMENT_TYPES = {
-    VerificationDocument.DocumentType.DONOR_IDENTITY,
-    VerificationDocument.DocumentType.AGE_VERIFICATION,
-    VerificationDocument.DocumentType.DONOR_DECLARATION,
+    VerificationDocument.DocumentType.DONOR_IDENTITY.value,
+    VerificationDocument.DocumentType.AGE_VERIFICATION.value,
+    VerificationDocument.DocumentType.DONOR_DECLARATION.value,
 }
 
 
