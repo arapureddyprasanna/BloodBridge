@@ -4,6 +4,7 @@ import os
 from audit_logs.models import AuditLog
 from django.db import transaction
 from django.db.models import Count, Q
+from django.db.models.functions import TruncMonth
 from django.http import FileResponse, HttpResponse
 from django.utils import timezone
 
@@ -22,6 +23,7 @@ from .models import (
     VerificationApplication,
     VerificationDocument,
 )
+from donations.models import Donation
 from .permission import IsSuperAdmin
 from .views import VERIFICATION_REQUIREMENTS
 
@@ -90,6 +92,194 @@ class SuperAdminDashboardView(APIView):
                 "created_at": blood_request.created_at,
             }
             for blood_request in urgent_requests[:5]
+        ]
+        user_growth = list(
+            User.objects
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+                # ---------------------------------------------------------
+        # Monthly registration growth — real database data
+        # Last 6 months are always returned, including zero counts.
+        # ---------------------------------------------------------
+        today = timezone.localdate()
+
+        month_starts = []
+        year = today.year
+        month = today.month
+
+        for _ in range(6):
+            month_starts.append((year, month))
+
+            month -= 1
+            if month == 0:
+                month = 12
+                year -= 1
+
+        month_starts.reverse()
+
+        first_year, first_month = month_starts[0]
+        first_month_start = today.replace(
+            year=first_year,
+            month=first_month,
+            day=1,
+        )
+
+        user_growth_rows = (
+            User.objects
+            .filter(created_at__gte=first_month_start)
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+        user_growth_map = {
+            (
+                row["month"].year,
+                row["month"].month,
+            ): row["total"]
+            for row in user_growth_rows
+            if row["month"] is not None
+        }
+
+        user_growth = [
+            {
+                "month": f"{year}-{month:02d}",
+                "total": user_growth_map.get((year, month), 0),
+            }
+            for year, month in month_starts
+        ]
+
+        # ---------------------------------------------------------
+        # Completed donation trend — real database data
+        # Last 6 months are always returned, including zero counts.
+        # ---------------------------------------------------------
+        completed_donation_rows = (
+            Donation.objects
+            .filter(
+                status=Donation.Status.COMPLETED,
+                donation_date__gte=first_month_start,
+            )
+            .annotate(month=TruncMonth("donation_date"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+        completed_donation_map = {
+            (
+                row["month"].year,
+                row["month"].month,
+            ): row["total"]
+            for row in completed_donation_rows
+            if row["month"] is not None
+        }
+
+        completed_donations_trend = [
+            {
+                "month": f"{year}-{month:02d}",
+                "total": completed_donation_map.get((year, month), 0),
+            }
+            for year, month in month_starts
+        ]
+
+        completed_donations_trend = list(
+            Donation.objects
+            .filter(status=Donation.Status.COMPLETED)
+            .annotate(month=TruncMonth("donation_date"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+                # ---------------------------------------------------------
+        # Monthly registration growth — real database data
+        # Last 6 months are always returned, including zero counts.
+        # ---------------------------------------------------------
+        today = timezone.localdate()
+
+        month_starts = []
+        year = today.year
+        month = today.month
+
+        for _ in range(6):
+            month_starts.append((year, month))
+
+            month -= 1
+            if month == 0:
+                month = 12
+                year -= 1
+
+        month_starts.reverse()
+
+        first_year, first_month = month_starts[0]
+        first_month_start = today.replace(
+            year=first_year,
+            month=first_month,
+            day=1,
+        )
+
+        user_growth_rows = (
+            User.objects
+            .filter(created_at__gte=first_month_start)
+            .annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+        user_growth_map = {
+            (
+                row["month"].year,
+                row["month"].month,
+            ): row["total"]
+            for row in user_growth_rows
+            if row["month"] is not None
+        }
+
+        user_growth = [
+            {
+                "month": f"{year}-{month:02d}",
+                "total": user_growth_map.get((year, month), 0),
+            }
+            for year, month in month_starts
+        ]
+
+        # ---------------------------------------------------------
+        # Completed donation trend — real database data
+        # Last 6 months are always returned, including zero counts.
+        # ---------------------------------------------------------
+        completed_donation_rows = (
+            Donation.objects
+            .filter(
+                status=Donation.Status.COMPLETED,
+                donation_date__gte=first_month_start,
+            )
+            .annotate(month=TruncMonth("donation_date"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("month")
+        )
+
+        completed_donation_map = {
+            (
+                row["month"].year,
+                row["month"].month,
+            ): row["total"]
+            for row in completed_donation_rows
+            if row["month"] is not None
+        }
+
+        completed_donations_trend = [
+            {
+                "month": f"{year}-{month:02d}",
+                "total": completed_donation_map.get((year, month), 0),
+            }
+            for year, month in month_starts
         ]
 
         return Response({
@@ -160,6 +350,8 @@ class SuperAdminDashboardView(APIView):
                 .filter(total__gt=0)
                 .order_by("role")
             ),
+            "user_growth": user_growth,
+            "completed_donations_trend": completed_donations_trend,
         })
 
 class PendingApplicationsView(APIView):
