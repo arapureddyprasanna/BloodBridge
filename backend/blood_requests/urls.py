@@ -7,7 +7,6 @@ from .views import (
     HospitalBloodRequestDetailView,
     HospitalBloodRequestCancelView,
     HospitalBloodRequestTrackingView,
-    HospitalBloodRequestFulfillView,
 )
 
 
@@ -45,9 +44,5 @@ urlpatterns = [
     HospitalBloodRequestTrackingView.as_view(),
     name="hospital-blood-request-tracking",
 ),
-path(
-    "hospital/blood-requests/<uuid:request_id>/fulfill/",
-    HospitalBloodRequestFulfillView.as_view(),
-    name="hospital-blood-request-fulfill",
-),
+
 ]

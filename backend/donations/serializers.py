@@ -8,6 +8,10 @@ class DonationSerializer(serializers.ModelSerializer):
         source="donor.full_name",
         read_only=True,
     )
+    donor_id = serializers.UUIDField(
+        source="donor.id",
+        read_only=True,
+    )
 
     donor_email = serializers.EmailField(
         source="donor.email",
@@ -45,12 +49,25 @@ class DonationSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
         read_only_fields = [
             "id",
             "blood_request_id",
             "donor_name",
             "donor_email",
             "blood_group",
+            "status",
             "created_at",
             "updated_at",
         ]
+
+
+class DonationCreateSerializer(serializers.Serializer):
+    blood_request_id = serializers.UUIDField()
+    donor_id = serializers.UUIDField()
+    units_donated = serializers.IntegerField(min_value=1)
+    donation_date = serializers.DateTimeField()
+    notes = serializers.CharField(
+        required=False,
+        allow_blank=True,
+    )
