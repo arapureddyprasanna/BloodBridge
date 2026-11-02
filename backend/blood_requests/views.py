@@ -939,7 +939,6 @@ class HospitalBloodRequestTrackingView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
 class HospitalBloodRequestFulfillView(APIView):
     authentication_classes = [FirebaseUserAuthentication]
     permission_classes = [IsAuthenticated]
@@ -985,6 +984,41 @@ class HospitalBloodRequestFulfillView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        accepted_invitations = list(
+            DonorInvitation.objects
+            .select_for_update()
+            .filter(
+                blood_request=blood_request,
+                status=DonorInvitation.Status.ACCEPTED,
+            )
+            .select_related("donor")
+        )
+
+        accepted_count = len(accepted_invitations)
+
+        if accepted_count > blood_request.units_required:
+            return Response(
+                {
+                    "detail": (
+                        "The number of accepted donors exceeds the "
+                        "required blood units."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        donation_date = timezone.now()
+
+        for invitation in accepted_invitations:
+            Donation.objects.create(
+                blood_request=blood_request,
+                donor=invitation.donor,
+                units_donated=1,
+                donation_date=donation_date,
+                status=Donation.Status.COMPLETED,
+                notes="Donation recorded when the hospital fulfilled the blood request.",
+            )
+
         blood_request.status = BloodRequest.Status.FULFILLED
         blood_request.save(update_fields=["status", "updated_at"])
 
@@ -1000,6 +1034,7 @@ class HospitalBloodRequestFulfillView(APIView):
                 "detail": "Blood request marked as fulfilled.",
                 "request_id": str(blood_request.id),
                 "status": blood_request.status,
+                "donations_recorded": accepted_count,
             },
             status=status.HTTP_200_OK,
         )
