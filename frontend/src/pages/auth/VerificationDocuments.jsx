@@ -42,8 +42,78 @@ function VerificationDocuments() {
             return null;
         }
 
-        return user.getIdToken(true);
+        return user.getIdToken();
     }, [navigate]);
+
+    const getDonorOnboardingStatus = useCallback(
+        async (token) => {
+            const response = await fetch(
+                `${API_BASE_URL}/communities/onboarding/status/`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const data =
+                await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail ||
+                    "Unable to check donor onboarding status."
+                );
+            }
+
+            return data;
+        },
+        []
+    );
+
+    const redirectDonorAccordingToOnboarding = useCallback(
+        (onboardingData) => {
+            const nextStep =
+                onboardingData?.next_step || null;
+
+            switch (nextStep) {
+                case "community_selection":
+                    navigate(
+                        "/donor/onboarding/community",
+                        { replace: true }
+                    );
+                    return true;
+
+                case "community_review":
+                    navigate(
+                        "/donor/onboarding/review",
+                        { replace: true }
+                    );
+                    return true;
+
+                case "dashboard":
+                    navigate(
+                        "/donor/dashboard",
+                        { replace: true }
+                    );
+                    return true;
+
+                case "documents":
+                    /*
+                     * This is the important case.
+                     *
+                     * The donor is supposed to be on this page,
+                     * so DO NOT navigate anywhere.
+                     */
+                    return false;
+
+                default:
+                    return false;
+            }
+        },
+        [navigate]
+    );
 
     const loadVerification = useCallback(async () => {
         try {
@@ -64,7 +134,8 @@ function VerificationDocuments() {
                 }
             );
 
-            const data = await response.json().catch(() => ({}));
+            const data =
+                await response.json().catch(() => ({}));
 
             if (!response.ok) {
                 throw new Error(
@@ -78,34 +149,86 @@ function VerificationDocuments() {
                 return;
             }
 
-            setRole(data.role || "");
-            setVerification(data.verification || null);
-
+            const currentRole = data.role || "";
             const currentVerification =
-                data.verification || {};
+                data.verification || null;
 
-            const status = currentVerification.status;
+            setRole(currentRole);
+            setVerification(currentVerification);
+
+            /*
+             * DONOR-SPECIFIC ROUTING
+             *
+             * Verification application status alone must NOT
+             * decide whether a donor can enter the dashboard.
+             *
+             * The donor onboarding state is authoritative:
+             *
+             * community_selection
+             * community_review
+             * documents
+             * dashboard
+             */
+            if (currentRole === "donor") {
+                const onboardingData =
+                    await getDonorOnboardingStatus(token);
+
+                const redirected =
+                    redirectDonorAccordingToOnboarding(
+                        onboardingData
+                    );
+
+                if (redirected) {
+                    return;
+                }
+
+                /*
+                 * next_step === "documents"
+                 *
+                 * Stay on this page.
+                 *
+                 * This prevents:
+                 *
+                 * /verification/documents
+                 *       ↓
+                 * /donor
+                 *       ↓
+                 * /verification/documents
+                 *
+                 * loop.
+                 */
+                return;
+            }
+
+            /*
+             * HOSPITAL / COMMUNITY VERIFICATION FLOW
+             *
+             * Their existing verification workflow remains
+             * unchanged.
+             */
+            const status =
+                currentVerification?.status;
 
             const hasRejectedDocuments =
-                currentVerification.requirements?.some(
+                currentVerification?.requirements?.some(
                     (document) =>
                         document.status === "rejected"
                 );
 
             /*
              * Submitted/under-review applications are normally
-             * locked. However, if a document was individually
-             * rejected, the applicant must be allowed to return
-             * here and replace it.
+             * locked. If an individual document was rejected,
+             * allow the applicant to return and replace it.
              */
             if (
                 (status === "submitted" ||
                     status === "under_review") &&
                 !hasRejectedDocuments
             ) {
-                navigate("/verification/pending", {
-                    replace: true,
-                });
+                navigate(
+                    "/verification/pending",
+                    { replace: true }
+                );
 
                 return;
             }
@@ -117,14 +240,22 @@ function VerificationDocuments() {
                 const routes = {
                     hospital_admin: "/hospital",
                     community_admin: "/community",
-                    donor: "/donor",
                 };
 
-                navigate(routes[data.role] || "/", {
-                    replace: true,
-                });
+                const route = routes[currentRole];
+
+                if (route) {
+                    navigate(route, {
+                        replace: true,
+                    });
+                }
             }
         } catch (err) {
+            console.error(
+                "Verification documents load failed:",
+                err
+            );
+
             setError(
                 err.message ||
                 "Unable to load verification information."
@@ -132,7 +263,12 @@ function VerificationDocuments() {
         } finally {
             setLoading(false);
         }
-    }, [getToken, navigate]);
+    }, [
+        getToken,
+        getDonorOnboardingStatus,
+        navigate,
+        redirectDonorAccordingToOnboarding,
+    ]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(
@@ -440,6 +576,10 @@ function VerificationDocuments() {
                 "success"
             );
 
+            /*
+             * After submission, the documents are under review.
+             * PendingVerification handles the review state.
+             */
             navigate(
                 "/verification/pending",
                 { replace: true }
@@ -475,6 +615,7 @@ function VerificationDocuments() {
             <main className="verification-page">
                 <section className="verification-shell verification-loading">
                     <div className="verification-spinner" />
+
                     <p>
                         Loading your verification application...
                     </p>
@@ -631,12 +772,13 @@ function VerificationDocuments() {
 
                                 return (
                                     <article
-                                        className={`verification-document-card ${isRejected
+                                        className={`verification-document-card ${
+                                            isRejected
                                                 ? "is-rejected"
                                                 : isUploaded
                                                     ? "is-uploaded"
                                                     : ""
-                                            }`}
+                                        }`}
                                         key={
                                             requirement.type
                                         }
@@ -702,54 +844,75 @@ function VerificationDocuments() {
                                         </div>
 
                                         <div className="verification-document-actions">
-                                            {isUploaded && document.id && (
-                                                <button
-                                                    type="button"
-                                                    className="verification-view-button"
-                                                    onClick={async () => {
-                                                        const token = await getToken();
+                                            {isUploaded &&
+                                                document.id && (
+                                                    <button
+                                                        type="button"
+                                                        className="verification-view-button"
+                                                        onClick={async () => {
+                                                            const token =
+                                                                await getToken();
 
-                                                        if (!token) return;
+                                                            if (!token)
+                                                                return;
 
-                                                        const url =
-                                                            `${API_BASE_URL}/auth/verification/documents/${document.id}/view/`;
+                                                            const url =
+                                                                `${API_BASE_URL}/auth/verification/documents/${document.id}/view/`;
 
-                                                        const response = await fetch(url, {
-                                                            headers: {
-                                                                Authorization: `Bearer ${token}`,
-                                                            },
-                                                        });
+                                                            const response =
+                                                                await fetch(
+                                                                    url,
+                                                                    {
+                                                                        headers: {
+                                                                            Authorization: `Bearer ${token}`,
+                                                                        },
+                                                                    }
+                                                                );
 
-                                                        if (!response.ok) {
-                                                            showToast(
-                                                                "Unable to open this document.",
-                                                                "error"
+                                                            if (
+                                                                !response.ok
+                                                            ) {
+                                                                showToast(
+                                                                    "Unable to open this document.",
+                                                                    "error"
+                                                                );
+                                                                return;
+                                                            }
+
+                                                            const blob =
+                                                                await response.blob();
+
+                                                            const blobUrl =
+                                                                URL.createObjectURL(
+                                                                    blob
+                                                                );
+
+                                                            window.open(
+                                                                blobUrl,
+                                                                "_blank",
+                                                                "noopener,noreferrer"
                                                             );
-                                                            return;
-                                                        }
 
-                                                        const blob = await response.blob();
-                                                        const blobUrl = URL.createObjectURL(blob);
+                                                            setTimeout(
+                                                                () => {
+                                                                    URL.revokeObjectURL(
+                                                                        blobUrl
+                                                                    );
+                                                                },
+                                                                60000
+                                                            );
+                                                        }}
+                                                    >
+                                                        View
+                                                    </button>
+                                                )}
 
-                                                        window.open(
-                                                            blobUrl,
-                                                            "_blank",
-                                                            "noopener,noreferrer"
-                                                        );
-
-                                                        setTimeout(() => {
-                                                            URL.revokeObjectURL(blobUrl);
-                                                        }, 60000);
-                                                    }}
-                                                >
-                                                    View
-                                                </button>
-                                            )}
                                             <label
-                                                className={`verification-upload-button ${isUploading
+                                                className={`verification-upload-button ${
+                                                    isUploading
                                                         ? "is-loading"
                                                         : ""
-                                                    }`}
+                                                }`}
                                             >
                                                 {isUploading
                                                     ? "Uploading..."
@@ -788,7 +951,7 @@ function VerificationDocuments() {
                                                 !isUploading &&
                                                 document.id &&
                                                 document.status !==
-                                                "verified" && (
+                                                    "verified" && (
                                                     <button
                                                         type="button"
                                                         className="verification-delete-button"
@@ -803,7 +966,7 @@ function VerificationDocuments() {
                                                         }
                                                     >
                                                         {deletingId ===
-                                                            document.id
+                                                        document.id
                                                             ? "Removing..."
                                                             : "Remove"}
                                                     </button>
@@ -849,16 +1012,17 @@ function VerificationDocuments() {
                                     const isRejected =
                                         isUploaded &&
                                         document?.status ===
-                                        "rejected";
+                                            "rejected";
 
                                     return (
                                         <article
-                                            className={`verification-document-card ${isRejected
+                                            className={`verification-document-card ${
+                                                isRejected
                                                     ? "is-rejected"
                                                     : isUploaded
                                                         ? "is-uploaded"
                                                         : ""
-                                                }`}
+                                            }`}
                                             key={
                                                 requirement.type
                                             }
@@ -926,10 +1090,11 @@ function VerificationDocuments() {
 
                                             <div className="verification-document-actions">
                                                 <label
-                                                    className={`verification-upload-button ${isUploading
+                                                    className={`verification-upload-button ${
+                                                        isUploading
                                                             ? "is-loading"
                                                             : ""
-                                                        }`}
+                                                    }`}
                                                 >
                                                     {isUploading
                                                         ? "Uploading..."
@@ -981,7 +1146,7 @@ function VerificationDocuments() {
                                                             }
                                                         >
                                                             {deletingId ===
-                                                                document.id
+                                                            document.id
                                                                 ? "Removing..."
                                                                 : "Remove"}
                                                         </button>
@@ -1003,7 +1168,7 @@ function VerificationDocuments() {
 
                         <h2>
                             {uploadedRequiredCount ===
-                                requiredCount
+                            requiredCount
                                 ? "Your required documents are complete."
                                 : "Complete all required documents first."}
                         </h2>
@@ -1022,7 +1187,7 @@ function VerificationDocuments() {
                             submitting ||
                             requiredCount === 0 ||
                             uploadedRequiredCount !==
-                            requiredCount
+                                requiredCount
                         }
                         onClick={handleSubmit}
                     >
