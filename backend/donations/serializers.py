@@ -4,12 +4,13 @@ from .models import Donation
 
 
 class DonationSerializer(serializers.ModelSerializer):
-    donor_name = serializers.CharField(
-        source="donor.full_name",
-        read_only=True,
-    )
     donor_id = serializers.UUIDField(
         source="donor.id",
+        read_only=True,
+    )
+
+    donor_name = serializers.CharField(
+        source="donor.full_name",
         read_only=True,
     )
 
@@ -38,6 +39,7 @@ class DonationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "blood_request_id",
+            "donor_id",
             "donor_name",
             "donor_email",
             "blood_group",
@@ -53,6 +55,7 @@ class DonationSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
             "blood_request_id",
+            "donor_id",
             "donor_name",
             "donor_email",
             "blood_group",
@@ -65,9 +68,12 @@ class DonationSerializer(serializers.ModelSerializer):
 class DonationCreateSerializer(serializers.Serializer):
     blood_request_id = serializers.UUIDField()
     donor_id = serializers.UUIDField()
-    units_donated = serializers.IntegerField(min_value=1)
+    units_donated = serializers.IntegerField(
+        min_value=1
+    )
     donation_date = serializers.DateTimeField()
     notes = serializers.CharField(
         required=False,
         allow_blank=True,
+        default="",
     )
