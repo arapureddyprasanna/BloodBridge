@@ -1147,11 +1147,8 @@ class DonorOnboardingStatusView(APIView):
         except VerificationApplication.DoesNotExist:
             verification = None
 
-        if (
-            donor.account_status == User.AccountStatus.ACTIVE
-            and verification is not None
-            and verification.status == VerificationApplication.Status.APPROVED
-        ):
+        if donor.account_status == User.AccountStatus.ACTIVE:
+           
             application = (
                 DonorCommunityApplication.objects
                 .filter(
