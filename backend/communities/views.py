@@ -1132,9 +1132,7 @@ class DonorOnboardingStatusView(APIView):
         if donor is None:
             return Response(
                 {
-                    "detail": (
-                        "Only registered donors can access this."
-                    )
+                    "detail": "Only registered donors can access this."
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -1152,50 +1150,47 @@ class DonorOnboardingStatusView(APIView):
         except VerificationApplication.DoesNotExist:
             verification = None
 
-        documents = {}
+        required_documents_uploaded = False
+        required_documents_verified = False
+        has_rejected_documents = False
+        has_pending_documents = False
 
         if verification is not None:
-            documents = {
-                document.document_type: document
-                for document in verification.documents.all()
-                if document.document_type
-                in DONOR_REQUIRED_DOCUMENT_TYPES
+            donor_documents = verification.documents.filter(
+                document_type__in=DONOR_REQUIRED_DOCUMENT_TYPES
+            )
+
+            uploaded_types = {
+                document.document_type
+                for document in donor_documents
+                if document.file
             }
 
-        required_documents_uploaded = all(
-            document_type in documents
-            for document_type in DONOR_REQUIRED_DOCUMENT_TYPES
-        )
+            verified_types = {
+                document.document_type
+                for document in donor_documents
+                if document.file
+                and document.status == VerificationDocument.Status.VERIFIED
+            }
 
-        required_documents_verified = all(
-            document_type in documents
-            and documents[document_type].status
-            == VerificationDocument.Status.VERIFIED
-            for document_type in DONOR_REQUIRED_DOCUMENT_TYPES
-        )
+            required_documents_uploaded = (
+                DONOR_REQUIRED_DOCUMENT_TYPES.issubset(uploaded_types)
+            )
 
-        has_rejected_documents = any(
-            document.status
-            == VerificationDocument.Status.REJECTED
-            for document in documents.values()
-        )
+            required_documents_verified = (
+                DONOR_REQUIRED_DOCUMENT_TYPES.issubset(verified_types)
+            )
 
-        has_pending_documents = any(
-            document.status
-            == VerificationDocument.Status.PENDING
-            for document in documents.values()
-        )
+            has_rejected_documents = donor_documents.filter(
+                status=VerificationDocument.Status.REJECTED
+            ).exists()
 
-        # -----------------------------------------------------
-        # 1. No community selected yet
-        # -----------------------------------------------------
+            has_pending_documents = donor_documents.filter(
+                status=VerificationDocument.Status.PENDING
+            ).exists()
 
         if application is None:
             next_step = "community_selection"
-
-        # -----------------------------------------------------
-        # 2. Community membership was rejected/cancelled
-        # -----------------------------------------------------
 
         elif application.status in {
             DonorCommunityApplication.Status.REJECTED,
@@ -1203,65 +1198,23 @@ class DonorOnboardingStatusView(APIView):
         }:
             next_step = "community_selection"
 
-        # -----------------------------------------------------
-        # 3. Community membership is still pending
-        # -----------------------------------------------------
-        #
-        # IMPORTANT:
-        # A pending community application means the donor is
-        # already inside the community-review stage.
-        #
-        # Even if a document is rejected and being replaced,
-        # do NOT send the donor back to the old documents route.
-        #
-        # Replacement now happens directly inside
-        # PendingVerification.
-        # -----------------------------------------------------
+        elif application.status == DonorCommunityApplication.Status.PENDING:
+            next_step = "documents"
 
-        elif application.status == (
-            DonorCommunityApplication.Status.PENDING
-        ):
-            if not required_documents_uploaded:
-                next_step = "documents"
-            else:
-                next_step = "documents"
-
-        # -----------------------------------------------------
-        # 4. Community membership accepted
-        # -----------------------------------------------------
-        #
-        # Community approval is the final donor onboarding
-        # approval step.
-        #
-        # If the donor is already accepted but documents are
-        # not fully verified, keep the donor in onboarding
-        # rather than allowing dashboard access.
-        # -----------------------------------------------------
-
-        elif application.status == (
-            DonorCommunityApplication.Status.ACCEPTED
-        ):
+        elif application.status == DonorCommunityApplication.Status.ACCEPTED:
             if required_documents_verified:
                 next_step = "dashboard"
             else:
                 next_step = "community_review"
-
-        # -----------------------------------------------------
-        # 5. Safety fallback
-        # -----------------------------------------------------
 
         else:
             next_step = "community_selection"
 
         return Response(
             {
-                "community_selected": (
-                    application is not None
-                ),
+                "community_selected": application is not None,
                 "community_application": (
-                    CommunityApplicationSerializer(
-                        application
-                    ).data
+                    CommunityApplicationSerializer(application).data
                     if application
                     else None
                 ),
@@ -1270,22 +1223,12 @@ class DonorOnboardingStatusView(APIView):
                     if verification
                     else None
                 ),
-                "required_documents_uploaded": (
-                    required_documents_uploaded
-                ),
-                "required_documents_verified": (
-                    required_documents_verified
-                ),
-                "has_rejected_documents": (
-                    has_rejected_documents
-                ),
-                "has_pending_documents": (
-                    has_pending_documents
-                ),
+                "required_documents_uploaded": required_documents_uploaded,
+                "required_documents_verified": required_documents_verified,
+                "has_rejected_documents": has_rejected_documents,
+                "has_pending_documents": has_pending_documents,
                 "next_step": next_step,
-                "dashboard_access": (
-                    next_step == "dashboard"
-                ),
+                "dashboard_access": next_step == "dashboard",
             }
         )
 

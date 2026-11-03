@@ -16,27 +16,11 @@ export default function DonorRoute({
     authorized: false,
     status: null,
     onboardingStep: null,
+    authError: null,
   });
 
   const [toastShown, setToastShown] = useState(false);
 
-  /*
-   * ---------------------------------------------------------
-   * REJECTED DOCUMENT REPLACEMENT
-   *
-   * Pending/under-review donors normally follow the onboarding
-   * next_step returned by the backend.
-   *
-   * However, when the community rejects an individual document,
-   * PendingVerification sends the donor here with:
-   *
-   * location.state.replaceRejected === true
-   *
-   * That is an intentional exception which allows the donor to
-   * open the document page even while the overall verification
-   * process is still under review.
-   * ---------------------------------------------------------
-   */
   const isReplacingRejectedDocument =
     location.pathname === "/verification/documents" &&
     location.state?.replaceRejected === true;
@@ -52,30 +36,41 @@ export default function DonorRoute({
             authorized: false,
             status: null,
             onboardingStep: null,
+            authError: null,
           });
         }
-
         return;
       }
 
       try {
-        await firebaseUser.reload();
-        const refreshedUser = auth.currentUser;
-        const passwordUser = refreshedUser?.providerData.some((provider) => provider.providerId === "password");
-        if (passwordUser && !refreshedUser.emailVerified) {
+        /*
+         * Do not force-refresh the Firebase ID token here.
+         *
+         * getIdToken() reuses the cached token when it is still valid
+         * and refreshes only when Firebase determines that a refresh
+         * is actually required.
+         */
+        const passwordUser = firebaseUser.providerData.some(
+          (provider) => provider.providerId === "password"
+        );
+
+        if (
+          passwordUser &&
+          firebaseUser.emailVerified !== true
+        ) {
           if (mounted) {
-            setState({ loading: false, authorized: false, status: "email-unverified", onboardingStep: null });
+            setState({
+              loading: false,
+              authorized: false,
+              status: "email-unverified",
+              onboardingStep: null,
+              authError: null,
+            });
           }
           return;
         }
-        if (!refreshedUser) throw new Error("Your session has expired. Please sign in again.");
-        const token = await refreshedUser.getIdToken(true);
 
-        /*
-         * -----------------------------------------------------
-         * BLOODBRIDGE PROFILE
-         * -----------------------------------------------------
-         */
+        const token = await firebaseUser.getIdToken();
 
         const response = await fetch(
           `${API_BASE_URL}/auth/me/`,
@@ -94,20 +89,22 @@ export default function DonorRoute({
         if (!response.ok) {
           throw new Error(
             profile.detail ||
-              "Unable to verify donor profile."
+            "Unable to verify donor profile."
           );
         }
 
         if (!mounted) return;
 
-        const isDonor =
-          profile.role === "donor";
+        const isDonor = profile.role === "donor";
 
         const accountStatus =
           profile.account_status ||
           profile.status;
 
-        const effectiveStatus = profile.is_active === false ? "inactive" : accountStatus;
+        const effectiveStatus =
+          profile.is_active === false
+            ? "inactive"
+            : accountStatus;
 
         if (!isDonor) {
           setState({
@@ -115,17 +112,14 @@ export default function DonorRoute({
             authorized: false,
             status: accountStatus,
             onboardingStep: null,
+            authError: null,
           });
-
           return;
         }
 
         /*
-         * -----------------------------------------------------
-         * DONOR ONBOARDING
-         * -----------------------------------------------------
+         * Onboarding routes are allowed for pending/active donors.
          */
-
         if (requireOnboarding) {
           if (
             effectiveStatus !== "pending" &&
@@ -136,8 +130,8 @@ export default function DonorRoute({
               authorized: false,
               status: effectiveStatus,
               onboardingStep: null,
+              authError: null,
             });
-
             return;
           }
 
@@ -155,11 +149,15 @@ export default function DonorRoute({
             await onboardingResponse
               .json()
               .catch(() => ({}));
+          console.log(
+            "DONOR ONBOARDING STATUS:",
+            onboardingData
+          );
 
           if (!onboardingResponse.ok) {
             throw new Error(
               onboardingData.detail ||
-                "Unable to check donor onboarding status."
+              "Unable to check donor onboarding status."
             );
           }
 
@@ -168,73 +166,51 @@ export default function DonorRoute({
           const nextStep =
             onboardingData.next_step || null;
 
-          /*
-           * ---------------------------------------------------
-           * IMPORTANT:
-           *
-           * A donor replacing a rejected document is allowed
-           * to remain on the documents page even when the
-           * onboarding API normally reports another step.
-           *
-           * This is NOT a general bypass.
-           *
-           * The exception is only valid when:
-           *
-           * 1. Current route is /verification/documents
-           * 2. location.state.replaceRejected === true
-           *
-           * Direct navigation to /verification/documents does
-           * NOT get this exception.
-           * ---------------------------------------------------
-           */
-
-          if (isReplacingRejectedDocument) {
-            setState({
-              loading: false,
-              authorized: true,
-              status: effectiveStatus,
-              onboardingStep: nextStep,
-            });
-
-            return;
-          }
-
           setState({
             loading: false,
             authorized: true,
             status: effectiveStatus,
             onboardingStep: nextStep,
+            authError: null,
           });
 
           return;
         }
 
         /*
-         * -----------------------------------------------------
-         * NORMAL DONOR WORKSPACE
-         *
-         * Only ACTIVE donors can enter the dashboard/workspace.
-         * -----------------------------------------------------
+         * Normal donor workspace requires an active donor.
          */
-
         if (effectiveStatus !== "active") {
           setState({
             loading: false,
             authorized: false,
             status: effectiveStatus,
             onboardingStep: null,
+            authError: null,
           });
-
           return;
         }
 
         const onboardingResponse = await fetch(
           `${API_BASE_URL}/communities/onboarding/status/`,
-          { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
-        const onboardingData = await onboardingResponse.json().catch(() => ({}));
+
+        const onboardingData =
+          await onboardingResponse
+            .json()
+            .catch(() => ({}));
+
         if (!onboardingResponse.ok) {
-          throw new Error(onboardingData.detail || "Unable to check donor onboarding status.");
+          throw new Error(
+            onboardingData.detail ||
+            "Unable to check donor onboarding status."
+          );
         }
 
         if (!mounted) return;
@@ -243,7 +219,9 @@ export default function DonorRoute({
           loading: false,
           authorized: true,
           status: effectiveStatus,
-          onboardingStep: onboardingData.next_step || null,
+          onboardingStep:
+            onboardingData.next_step || null,
+          authError: null,
         });
       } catch (error) {
         console.error(
@@ -253,11 +231,21 @@ export default function DonorRoute({
 
         if (!mounted) return;
 
+        /*
+         * A Firebase token-refresh failure is NOT a role failure.
+         * Keep the user out of the protected area rather than sending
+         * them to Access Denied, which is specifically for authorization
+         * failures.
+         */
         setState({
           loading: false,
           authorized: false,
           status: null,
           onboardingStep: null,
+          authError:
+            error?.code ||
+            error?.message ||
+            "Unable to verify your session.",
         });
       }
     };
@@ -278,12 +266,6 @@ export default function DonorRoute({
     isReplacingRejectedDocument,
   ]);
 
-  /*
-   * ---------------------------------------------------------
-   * LOADING
-   * ---------------------------------------------------------
-   */
-
   if (state.loading) {
     return (
       <div className="bb-route-loading">
@@ -293,15 +275,29 @@ export default function DonorRoute({
   }
 
   /*
-   * ---------------------------------------------------------
-   * UNAUTHORIZED
-   * ---------------------------------------------------------
+   * Firebase/session errors must not be represented as role errors.
    */
+  if (state.authError) {
+    return (
+      <div className="bb-route-loading">
+        Unable to verify your session. Please try again.
+      </div>
+    );
+  }
 
   if (!state.authorized) {
     if (state.status === "email-unverified") {
-      return <Navigate to="/register" replace state={{ emailVerificationRequired: true }} />;
+      return (
+        <Navigate
+          to="/register"
+          replace
+          state={{
+            emailVerificationRequired: true,
+          }}
+        />
+      );
     }
+
     if (state.status === "suspended") {
       return (
         <Navigate
@@ -323,39 +319,25 @@ export default function DonorRoute({
         <Navigate
           to="/verification/pending"
           replace
-          state={{ from: location }}
+          state={{
+            from: location,
+          }}
         />
       );
     }
 
-    return <Navigate to="/access-denied" replace />;
+    return (
+      <Navigate
+        to="/access-denied"
+        replace
+      />
+    );
   }
-
-  /*
-   * ---------------------------------------------------------
-   * ONBOARDING STATE
-   *
-   * Do NOT apply normal next_step redirects when the donor is
-   * intentionally replacing a rejected document.
-   * ---------------------------------------------------------
-   */
 
   if (
     requireOnboarding &&
     !isReplacingRejectedDocument
   ) {
-    /*
-     * -------------------------------------------------------
-     * COMMUNITY SELECTION
-     *
-     * This guarantees that a donor cannot manually type:
-     *
-     * /verification/documents
-     *
-     * before selecting a community.
-     * -------------------------------------------------------
-     */
-
     if (
       state.onboardingStep ===
       "community_selection"
@@ -368,7 +350,6 @@ export default function DonorRoute({
           toast.error(
             "Please complete the community selection step first."
           );
-
           setToastShown(true);
         }
 
@@ -381,12 +362,6 @@ export default function DonorRoute({
         );
       }
     }
-
-    /*
-     * -------------------------------------------------------
-     * DOCUMENTS
-     * -------------------------------------------------------
-     */
 
     if (
       state.onboardingStep === "documents"
@@ -404,12 +379,6 @@ export default function DonorRoute({
         );
       }
     }
-
-    /*
-     * -------------------------------------------------------
-     * COMMUNITY REVIEW
-     * -------------------------------------------------------
-     */
 
     if (
       state.onboardingStep ===
@@ -429,12 +398,6 @@ export default function DonorRoute({
       }
     }
 
-    /*
-     * -------------------------------------------------------
-     * DASHBOARD
-     * -------------------------------------------------------
-     */
-
     if (
       state.onboardingStep === "dashboard"
     ) {
@@ -453,20 +416,30 @@ export default function DonorRoute({
     }
   }
 
-  if (!requireOnboarding && state.onboardingStep && state.onboardingStep !== "dashboard") {
+  if (
+    !requireOnboarding &&
+    state.onboardingStep &&
+    state.onboardingStep !== "dashboard"
+  ) {
     const onboardingPath = {
-      community_selection: "/donor/onboarding/community",
-      documents: "/verification/documents",
-      community_review: "/donor/onboarding/review",
+      community_selection:
+        "/donor/onboarding/community",
+      documents:
+        "/verification/documents",
+      community_review:
+        "/donor/onboarding/review",
     }[state.onboardingStep];
-    if (onboardingPath) return <Navigate to={onboardingPath} replace state={{ from: location }} />;
-  }
 
-  /*
-   * ---------------------------------------------------------
-   * AUTHORIZED
-   * ---------------------------------------------------------
-   */
+    if (onboardingPath) {
+      return (
+        <Navigate
+          to={onboardingPath}
+          replace
+          state={{ from: location }}
+        />
+      );
+    }
+  }
 
   return children;
 }
