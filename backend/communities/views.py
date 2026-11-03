@@ -1190,7 +1190,7 @@ class DonorOnboardingStatusView(APIView):
             ).exists()
 
         if application is None:
-            next_step = "community_selection"
+           next_step = "community_selection"
 
         elif application.status in {
             DonorCommunityApplication.Status.REJECTED,
@@ -1199,16 +1199,16 @@ class DonorOnboardingStatusView(APIView):
             next_step = "community_selection"
 
         elif application.status == DonorCommunityApplication.Status.PENDING:
-            next_step = "documents"
+             next_step = "community_review"
 
         elif application.status == DonorCommunityApplication.Status.ACCEPTED:
             if required_documents_verified:
-                next_step = "dashboard"
+               next_step = "dashboard"
             else:
-                next_step = "community_review"
+               next_step = "documents"
 
         else:
-            next_step = "community_selection"
+             next_step = "community_selection"
 
         return Response(
             {
