@@ -1121,7 +1121,6 @@ class CommunityMemberListView(APIView):
             }
         )
 
-
 class DonorOnboardingStatusView(APIView):
     authentication_classes = [FirebaseUserAuthentication]
     permission_classes = [IsAuthenticated, IsDonorOnboarding]
@@ -1137,18 +1136,80 @@ class DonorOnboardingStatusView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        application = (
+        # ---------------------------------------------------------
+        # APPROVED DONOR
+        # ---------------------------------------------------------
+        # Once a donor has been approved and their account is active,
+        # they have completed onboarding and must go directly to the
+        # donor dashboard.
+        try:
+            verification = donor.verification_application
+        except VerificationApplication.DoesNotExist:
+            verification = None
+
+        if (
+            donor.account_status == User.AccountStatus.ACTIVE
+            and verification is not None
+            and verification.status == VerificationApplication.Status.APPROVED
+        ):
+            application = (
+                DonorCommunityApplication.objects
+                .filter(
+                    donor=donor,
+                    status=DonorCommunityApplication.Status.ACCEPTED,
+                )
+                .select_related("community")
+                .order_by("-submitted_at")
+                .first()
+            )
+
+            return Response(
+                {
+                    "community_selected": True,
+                    "community_application": (
+                        CommunityApplicationSerializer(application).data
+                        if application
+                        else None
+                    ),
+                    "verification_status": verification.status,
+                    "required_documents_uploaded": True,
+                    "required_documents_verified": True,
+                    "has_rejected_documents": False,
+                    "has_pending_documents": False,
+                    "next_step": "dashboard",
+                    "dashboard_access": True,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        # ---------------------------------------------------------
+        # NORMAL DONOR ONBOARDING
+        # ---------------------------------------------------------
+
+        # Prefer an accepted community application.
+        accepted_application = (
             DonorCommunityApplication.objects
-            .filter(donor=donor)
+            .filter(
+                donor=donor,
+                status=DonorCommunityApplication.Status.ACCEPTED,
+            )
             .select_related("community")
             .order_by("-submitted_at")
             .first()
         )
 
-        try:
-            verification = donor.verification_application
-        except VerificationApplication.DoesNotExist:
-            verification = None
+        # If there is no accepted application, use the latest
+        # application to determine the current onboarding step.
+        application = accepted_application
+
+        if application is None:
+            application = (
+                DonorCommunityApplication.objects
+                .filter(donor=donor)
+                .select_related("community")
+                .order_by("-submitted_at")
+                .first()
+            )
 
         required_documents_uploaded = False
         required_documents_verified = False
@@ -1169,8 +1230,11 @@ class DonorOnboardingStatusView(APIView):
             verified_types = {
                 document.document_type
                 for document in donor_documents
-                if document.file
-                and document.status == VerificationDocument.Status.VERIFIED
+                if (
+                    document.file
+                    and document.status
+                    == VerificationDocument.Status.VERIFIED
+                )
             }
 
             required_documents_uploaded = (
@@ -1189,8 +1253,12 @@ class DonorOnboardingStatusView(APIView):
                 status=VerificationDocument.Status.PENDING
             ).exists()
 
+        # ---------------------------------------------------------
+        # DETERMINE NEXT ONBOARDING STEP
+        # ---------------------------------------------------------
+
         if application is None:
-           next_step = "community_selection"
+            next_step = "community_selection"
 
         elif application.status in {
             DonorCommunityApplication.Status.REJECTED,
@@ -1199,16 +1267,20 @@ class DonorOnboardingStatusView(APIView):
             next_step = "community_selection"
 
         elif application.status == DonorCommunityApplication.Status.PENDING:
-             next_step = "community_review"
+            next_step = "community_review"
 
         elif application.status == DonorCommunityApplication.Status.ACCEPTED:
             if required_documents_verified:
-               next_step = "dashboard"
+                next_step = "dashboard"
             else:
-               next_step = "documents"
+                next_step = "documents"
 
         else:
-             next_step = "community_selection"
+            next_step = "community_selection"
+
+        # ---------------------------------------------------------
+        # RESPONSE
+        # ---------------------------------------------------------
 
         return Response(
             {
@@ -1223,13 +1295,22 @@ class DonorOnboardingStatusView(APIView):
                     if verification
                     else None
                 ),
-                "required_documents_uploaded": required_documents_uploaded,
-                "required_documents_verified": required_documents_verified,
-                "has_rejected_documents": has_rejected_documents,
-                "has_pending_documents": has_pending_documents,
+                "required_documents_uploaded": (
+                    required_documents_uploaded
+                ),
+                "required_documents_verified": (
+                    required_documents_verified
+                ),
+                "has_rejected_documents": (
+                    has_rejected_documents
+                ),
+                "has_pending_documents": (
+                    has_pending_documents
+                ),
                 "next_step": next_step,
                 "dashboard_access": next_step == "dashboard",
-            }
+            },
+            status=status.HTTP_200_OK,
         )
 
 class CommunityDocumentReviewView(APIView):
