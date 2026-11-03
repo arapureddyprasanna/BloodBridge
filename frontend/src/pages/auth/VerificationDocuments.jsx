@@ -469,13 +469,12 @@ function VerificationDocuments() {
             );
 
             /*
-             * After submission, the documents are under review.
-             * PendingVerification handles the review state.
+             * The route guard resolves whether the submitted documents
+             * move this donor to community review or another backend step.
              */
-            navigate(
-                "/verification/pending",
-                { replace: true }
-            );
+            navigate("/donor/onboarding/review", {
+                replace: true,
+            });
         } catch (err) {
             showToast(
                 err.message ||

@@ -125,15 +125,14 @@ function AppRoutes() {
                 ↓
               Community Selection
                 ↓
-              Community Review
-                ↓
               Documents
+                ↓
+              Community Review
                 ↓
               Dashboard
 
-            IMPORTANT:
-            Community selection remains outside DonorRoute
-            because newly registered donors are pending.
+            DonorRoute resolves each onboarding destination from
+            the backend onboarding status.
         ===================================================== */}
 
         <Route

@@ -1136,54 +1136,11 @@ class DonorOnboardingStatusView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # ---------------------------------------------------------
-        # APPROVED DONOR
-        # ---------------------------------------------------------
-        # Once a donor has been approved and their account is active,
-        # they have completed onboarding and must go directly to the
-        # donor dashboard.
         try:
             verification = donor.verification_application
         except VerificationApplication.DoesNotExist:
             verification = None
 
-        if donor.account_status == User.AccountStatus.ACTIVE:
-           
-            application = (
-                DonorCommunityApplication.objects
-                .filter(
-                    donor=donor,
-                    status=DonorCommunityApplication.Status.ACCEPTED,
-                )
-                .select_related("community")
-                .order_by("-submitted_at")
-                .first()
-            )
-
-            return Response(
-                {
-                    "community_selected": True,
-                    "community_application": (
-                        CommunityApplicationSerializer(application).data
-                        if application
-                        else None
-                    ),
-                    "verification_status": verification.status,
-                    "required_documents_uploaded": True,
-                    "required_documents_verified": True,
-                    "has_rejected_documents": False,
-                    "has_pending_documents": False,
-                    "next_step": "dashboard",
-                    "dashboard_access": True,
-                },
-                status=status.HTTP_200_OK,
-            )
-
-        # ---------------------------------------------------------
-        # NORMAL DONOR ONBOARDING
-        # ---------------------------------------------------------
-
-        # Prefer an accepted community application.
         accepted_application = (
             DonorCommunityApplication.objects
             .filter(
@@ -1195,8 +1152,6 @@ class DonorOnboardingStatusView(APIView):
             .first()
         )
 
-        # If there is no accepted application, use the latest
-        # application to determine the current onboarding step.
         application = accepted_application
 
         if application is None:
@@ -1250,28 +1205,45 @@ class DonorOnboardingStatusView(APIView):
                 status=VerificationDocument.Status.PENDING
             ).exists()
 
+        required_documents_submitted = (
+            verification is not None
+            and verification.status in {
+                VerificationApplication.Status.SUBMITTED,
+                VerificationApplication.Status.UNDER_REVIEW,
+                VerificationApplication.Status.APPROVED,
+            }
+            and required_documents_uploaded
+            and not has_rejected_documents
+        )
+
+        dashboard_access = (
+            donor.account_status == User.AccountStatus.ACTIVE
+            and donor.is_active
+            and accepted_application is not None
+            and required_documents_verified
+        )
+
         # ---------------------------------------------------------
         # DETERMINE NEXT ONBOARDING STEP
         # ---------------------------------------------------------
 
-        if application is None:
-            next_step = "community_selection"
-
-        elif application.status in {
-            DonorCommunityApplication.Status.REJECTED,
-            DonorCommunityApplication.Status.CANCELLED,
-        }:
-            next_step = "community_selection"
-
-        elif application.status == DonorCommunityApplication.Status.PENDING:
-            next_step = "community_review"
-
-        elif application.status == DonorCommunityApplication.Status.ACCEPTED:
-            if required_documents_verified:
-                next_step = "dashboard"
+        if dashboard_access:
+            next_step = "dashboard"
+        elif (
+            application is not None
+            and application.status
+            == DonorCommunityApplication.Status.PENDING
+        ):
+            if required_documents_submitted:
+                next_step = "community_review"
             else:
                 next_step = "documents"
-
+        elif (
+            application is not None
+            and application.status
+            == DonorCommunityApplication.Status.ACCEPTED
+        ):
+            next_step = "pending"
         else:
             next_step = "community_selection"
 
@@ -1281,7 +1253,13 @@ class DonorOnboardingStatusView(APIView):
 
         return Response(
             {
-                "community_selected": application is not None,
+                "community_selected": (
+                    application is not None
+                    and application.status in {
+                        DonorCommunityApplication.Status.PENDING,
+                        DonorCommunityApplication.Status.ACCEPTED,
+                    }
+                ),
                 "community_application": (
                     CommunityApplicationSerializer(application).data
                     if application
@@ -1305,7 +1283,7 @@ class DonorOnboardingStatusView(APIView):
                     has_pending_documents
                 ),
                 "next_step": next_step,
-                "dashboard_access": next_step == "dashboard",
+                "dashboard_access": dashboard_access,
             },
             status=status.HTTP_200_OK,
         )
