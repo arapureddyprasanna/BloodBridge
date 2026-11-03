@@ -2593,3 +2593,373 @@
 .hospital-community-share-option strong { color: #2d2525; font-size: 12px; overflow-wrap: anywhere; }
 .hospital-community-share-option small { color: #756868; font-size: 10px; }
 @media (max-width: 600px) { .hospital-community-share-list { grid-template-columns: minmax(0, 1fr); } }
+
+
+
+/* =========================================================
+   RECORD DONATION MODAL
+   ========================================================= */
+
+.hospital-donation-modal {
+  width: min(680px, calc(100vw - 32px));
+  max-height: min(90vh, 760px);
+  overflow-y: auto;
+
+  background: #fffdfc;
+  border: 1px solid #e6d8d5;
+  border-radius: 16px;
+
+  box-shadow: 0 24px 70px rgba(45, 37, 37, 0.24);
+
+  color: #2d2525;
+}
+
+.hospital-donation-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+
+  padding: 28px 30px 24px;
+
+  border-bottom: 1px solid #e6d8d5;
+}
+
+.hospital-donation-modal-eyebrow {
+  margin: 0 0 6px;
+
+  color: #7a1f2b;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hospital-donation-modal-title {
+  margin: 0;
+
+  color: #2d2525;
+
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.hospital-donation-modal-description {
+  max-width: 560px;
+
+  margin: 7px 0 0;
+
+  color: #756868;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.hospital-donation-modal-close {
+  flex: 0 0 auto;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #e6d8d5;
+  border-radius: 8px;
+
+  background: #fffdfc;
+  color: #641923;
+
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.hospital-donation-modal-close:hover:not(:disabled) {
+  background: #faf5f2;
+  border-color: #b97878;
+}
+
+.hospital-donation-modal-close:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   DONOR SUMMARY
+   ========================================================= */
+
+.hospital-donation-summary {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+
+  border-bottom: 1px solid #e6d8d5;
+}
+
+.hospital-donation-summary-item {
+  min-width: 0;
+
+  padding: 18px 20px;
+
+  border-right: 1px solid #e6d8d5;
+}
+
+.hospital-donation-summary-item:last-child {
+  border-right: 0;
+}
+
+.hospital-donation-summary-item span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #756868;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hospital-donation-summary-item strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #2d2525;
+
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+}
+
+.hospital-donation-summary-primary strong {
+  color: #641923;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.hospital-donation-form {
+  padding: 26px 30px 0;
+}
+
+.hospital-donation-section-heading {
+  margin-bottom: 20px;
+}
+
+.hospital-donation-section-heading h3 {
+  margin: 0;
+
+  color: #2d2525;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hospital-donation-section-heading p {
+  margin: 4px 0 0;
+
+  color: #756868;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hospital-donation-form-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 18px;
+}
+
+.hospital-donation-field {
+  min-width: 0;
+
+  margin-bottom: 18px;
+}
+
+.hospital-donation-field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #2d2525;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hospital-donation-field label span {
+  color: #9a8d8d;
+  font-weight: 400;
+}
+
+.hospital-donation-field input,
+.hospital-donation-field textarea {
+  box-sizing: border-box;
+
+  width: 100%;
+
+  border: 1px solid #d9c9c6;
+  border-radius: 8px;
+
+  background: #fffdfc;
+  color: #2d2525;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.hospital-donation-field input {
+  min-height: 44px;
+  padding: 10px 12px;
+}
+
+.hospital-donation-field textarea {
+  min-height: 108px;
+
+  padding: 11px 12px;
+
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.hospital-donation-field input:focus,
+.hospital-donation-field textarea:focus {
+  border-color: #7a1f2b;
+
+  box-shadow: 0 0 0 3px rgba(122, 31, 43, 0.09);
+
+  background: #fff;
+}
+
+.hospital-donation-field input:disabled,
+.hospital-donation-field textarea:disabled {
+  background: #faf5f2;
+  cursor: not-allowed;
+}
+
+.hospital-donation-field-help {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #8b7d7d;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.hospital-donation-notes-field {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.hospital-donation-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 26px;
+  padding: 18px 0 24px;
+
+  border-top: 1px solid #e6d8d5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .hospital-donation-modal {
+    width: calc(100vw - 24px);
+    max-height: 92vh;
+    border-radius: 12px;
+  }
+
+  .hospital-donation-modal-header {
+    padding: 22px 20px 20px;
+  }
+
+  .hospital-donation-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hospital-donation-summary-item:nth-child(2) {
+    border-right: 0;
+  }
+
+  .hospital-donation-summary-item:nth-child(-n + 2) {
+    border-bottom: 1px solid #e6d8d5;
+  }
+
+  .hospital-donation-form {
+    padding: 22px 20px 0;
+  }
+
+  .hospital-donation-form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .hospital-donation-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .hospital-donation-modal-footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .hospital-donation-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hospital-donation-summary-item {
+    padding: 15px 14px;
+  }
+
+  .hospital-donation-summary-item strong {
+    font-size: 13px;
+  }
+
+  .hospital-donation-modal-title {
+    font-size: 19px;
+  }
+
+  .hospital-donation-modal-description {
+    font-size: 12px;
+  }
+}

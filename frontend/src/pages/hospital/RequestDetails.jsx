@@ -171,7 +171,7 @@ export default function RequestDetails() {
       if (!requestResponse.ok) {
         throw new Error(
           requestData?.detail ||
-            "Unable to load this blood request."
+          "Unable to load this blood request."
         );
       }
 
@@ -222,21 +222,21 @@ export default function RequestDetails() {
       if (!sharingResponse.ok) {
         throw new Error(
           sharingData.detail ||
-            "Unable to load community sharing options."
+          "Unable to load community sharing options."
         );
       }
 
       if (!trackingResponse.ok) {
         throw new Error(
           trackingData.detail ||
-            "Unable to load request tracking."
+          "Unable to load request tracking."
         );
       }
 
       if (!donationsResponse.ok) {
         throw new Error(
           donationsData.detail ||
-            "Unable to load donation information."
+          "Unable to load donation information."
         );
       }
 
@@ -269,7 +269,7 @@ export default function RequestDetails() {
 
       showToast(
         error.message ||
-          "Unable to load this blood request.",
+        "Unable to load this blood request.",
         "error"
       );
     } finally {
@@ -317,7 +317,7 @@ export default function RequestDetails() {
 
   const completedRemainingUnits = Math.max(
     Number(request?.units_required || 0) -
-      completedUnits,
+    completedUnits,
     0
   );
 
@@ -342,7 +342,7 @@ export default function RequestDetails() {
 
     const localDateTime = new Date(
       now.getTime() -
-        now.getTimezoneOffset() * 60000
+      now.getTimezoneOffset() * 60000
     )
       .toISOString()
       .slice(0, 16);
@@ -454,7 +454,7 @@ export default function RequestDetails() {
     } catch (error) {
       showToast(
         error.message ||
-          "Unable to record the donation.",
+        "Unable to record the donation.",
         "error"
       );
     } finally {
@@ -500,7 +500,7 @@ export default function RequestDetails() {
       if (!response.ok) {
         throw new Error(
           data?.detail ||
-            "Unable to confirm the donation."
+          "Unable to confirm the donation."
         );
       }
 
@@ -513,7 +513,7 @@ export default function RequestDetails() {
     } catch (error) {
       showToast(
         error.message ||
-          "Unable to confirm the donation.",
+        "Unable to confirm the donation.",
         "error"
       );
     } finally {
@@ -552,7 +552,7 @@ export default function RequestDetails() {
       if (!response.ok) {
         throw new Error(
           data.detail ||
-            "Unable to update community sharing."
+          "Unable to update community sharing."
         );
       }
 
@@ -562,7 +562,7 @@ export default function RequestDetails() {
     } catch (error) {
       showToast(
         error.message ||
-          "Unable to update community sharing.",
+        "Unable to update community sharing.",
         "error"
       );
     } finally {
@@ -655,18 +655,18 @@ export default function RequestDetails() {
           {activeRequestStatuses.includes(
             request.status
           ) && (
-            <button
-              type="button"
-              className="hospital-primary-button"
-              onClick={() =>
-                navigate(
-                  `/requests/${request.id}/matches`
-                )
-              }
-            >
-              Find Matching Donors
-            </button>
-          )}
+              <button
+                type="button"
+                className="hospital-primary-button"
+                onClick={() =>
+                  navigate(
+                    `/requests/${request.id}/matches`
+                  )
+                }
+              >
+                Find Matching Donors
+              </button>
+            )}
         </div>
       </div>
 
@@ -876,10 +876,10 @@ export default function RequestDetails() {
                             )}
                           >
                             {donation.status ===
-                            "completed"
+                              "completed"
                               ? "Completed"
                               : donation.status ===
-                                  "scheduled"
+                                "scheduled"
                                 ? "Scheduled"
                                 : "Cancelled"}
                           </span>
@@ -896,7 +896,7 @@ export default function RequestDetails() {
                             request.status
                           ) &&
                           completedRemainingUnits >
-                            0 && (
+                          0 && (
                             <button
                               type="button"
                               className="hospital-primary-button"
@@ -912,32 +912,32 @@ export default function RequestDetails() {
 
                         {donation?.status ===
                           "scheduled" && (
-                          <button
-                            type="button"
-                            className="hospital-primary-button"
-                            onClick={() =>
-                              completeDonation(
-                                donation
-                              )
-                            }
-                            disabled={
-                              completingDonationId ===
-                              donation.id
-                            }
-                          >
-                            {completingDonationId ===
-                            donation.id
-                              ? "Confirming…"
-                              : "Confirm Donation"}
-                          </button>
-                        )}
+                            <button
+                              type="button"
+                              className="hospital-primary-button"
+                              onClick={() =>
+                                completeDonation(
+                                  donation
+                                )
+                              }
+                              disabled={
+                                completingDonationId ===
+                                donation.id
+                              }
+                            >
+                              {completingDonationId ===
+                                donation.id
+                                ? "Confirming…"
+                                : "Confirm Donation"}
+                            </button>
+                          )}
 
                         {donation?.status ===
                           "completed" && (
-                          <span className="hospital-badge hospital-badge-success">
-                            Completed
-                          </span>
-                        )}
+                            <span className="hospital-badge hospital-badge-success">
+                              Completed
+                            </span>
+                          )}
                       </td>
                     </tr>
                   );
@@ -1165,14 +1165,14 @@ export default function RequestDetails() {
                           (current) =>
                             event.target.checked
                               ? [
-                                  ...current,
-                                  community.id,
-                                ]
+                                ...current,
+                                community.id,
+                              ]
                               : current.filter(
-                                  (id) =>
-                                    id !==
-                                    community.id
-                                )
+                                (id) =>
+                                  id !==
+                                  community.id
+                              )
                         )
                       }
                     />
@@ -1262,32 +1262,32 @@ export default function RequestDetails() {
         {activeRequestStatuses.includes(
           request.status
         ) && (
-          <div className="hospital-page-actions">
-            <button
-              type="button"
-              className="hospital-primary-button"
-              onClick={() =>
-                navigate(
-                  `/requests/${request.id}/matches`
-                )
-              }
-            >
-              View Matching Donors
-            </button>
+            <div className="hospital-page-actions">
+              <button
+                type="button"
+                className="hospital-primary-button"
+                onClick={() =>
+                  navigate(
+                    `/requests/${request.id}/matches`
+                  )
+                }
+              >
+                View Matching Donors
+              </button>
 
-            <button
-              type="button"
-              className="hospital-secondary-button"
-              onClick={() =>
-                navigate(
-                  `/requests/${request.id}/tracking`
-                )
-              }
-            >
-              Track Request
-            </button>
-          </div>
-        )}
+              <button
+                type="button"
+                className="hospital-secondary-button"
+                onClick={() =>
+                  navigate(
+                    `/requests/${request.id}/tracking`
+                  )
+                }
+              >
+                Track Request
+              </button>
+            </div>
+          )}
 
         {request.status === "fulfilled" && (
           <div className="hospital-page-actions">
@@ -1317,40 +1317,48 @@ export default function RequestDetails() {
           }}
         >
           <div
-            className="hospital-modal"
+            className="hospital-donation-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="record-donation-title"
           >
-            <div className="hospital-card-header">
+            {/* Header */}
+            <div className="hospital-donation-modal-header">
               <div>
+                <p className="hospital-donation-modal-eyebrow">
+                  Donation coordination
+                </p>
+
                 <h2
                   id="record-donation-title"
-                  className="hospital-card-title"
+                  className="hospital-donation-modal-title"
                 >
                   Record Donation
                 </h2>
 
-                <p className="hospital-card-subtitle">
-                  Record the donation as scheduled.
-                  It will only count toward fulfilment
-                  after confirmation.
+                <p className="hospital-donation-modal-description">
+                  Record this donation as scheduled. It will only
+                  count toward fulfilment after the hospital confirms
+                  that the donation was completed.
                 </p>
               </div>
 
               <button
                 type="button"
-                className="hospital-text-button"
+                className="hospital-donation-modal-close"
                 onClick={closeDonationModal}
                 disabled={savingDonation}
+                aria-label="Close donation modal"
               >
-                ✕
+                ×
               </button>
             </div>
 
-            <div className="hospital-detail-grid">
-              <div className="hospital-detail-item">
+            {/* Donor summary */}
+            <div className="hospital-donation-summary">
+              <div className="hospital-donation-summary-item hospital-donation-summary-primary">
                 <span>Donor</span>
+
                 <strong>
                   {selectedDonor.donor_name ||
                     selectedDonor.name ||
@@ -1358,40 +1366,51 @@ export default function RequestDetails() {
                 </strong>
               </div>
 
-              <div className="hospital-detail-item">
+              <div className="hospital-donation-summary-item">
                 <span>Blood Group</span>
+
                 <strong>
-                  {selectedDonor.blood_group ||
-                    "—"}
+                  {selectedDonor.blood_group || "—"}
                 </strong>
               </div>
 
-              <div className="hospital-detail-item">
+              <div className="hospital-donation-summary-item">
                 <span>Distance</span>
+
                 <strong>
-                  {selectedDonor.distance_km !=
-                  null
+                  {selectedDonor.distance_km != null
                     ? `${selectedDonor.distance_km} km`
                     : "—"}
                 </strong>
               </div>
 
-              <div className="hospital-detail-item">
-                <span>Remaining Units</span>
+              <div className="hospital-donation-summary-item">
+                <span>Remaining</span>
+
                 <strong>
-                  {completedRemainingUnits}
+                  {completedRemainingUnits} unit
+                  {completedRemainingUnits === 1 ? "" : "s"}
                 </strong>
               </div>
             </div>
 
+            {/* Form */}
             <form
               onSubmit={recordDonation}
-              className="hospital-form"
+              className="hospital-donation-form"
             >
-              <div className="hospital-form-grid">
-                <div className="hospital-form-group">
+              <div className="hospital-donation-section-heading">
+                <h3>Donation details</h3>
+
+                <p>
+                  Enter the scheduled donation information below.
+                </p>
+              </div>
+
+              <div className="hospital-donation-form-grid">
+                <div className="hospital-donation-field">
                   <label htmlFor="units_donated">
-                    Units Donated
+                    Units donated
                   </label>
 
                   <input
@@ -1400,39 +1419,37 @@ export default function RequestDetails() {
                     type="number"
                     min="1"
                     max={completedRemainingUnits}
-                    value={
-                      donationForm.units_donated
-                    }
-                    onChange={
-                      handleDonationFormChange
-                    }
+                    value={donationForm.units_donated}
+                    onChange={handleDonationFormChange}
                     required
                   />
+
+                  <span className="hospital-donation-field-help">
+                    Maximum {completedRemainingUnits} unit
+                    {completedRemainingUnits === 1 ? "" : "s"}
+                    available for this request.
+                  </span>
                 </div>
 
-                <div className="hospital-form-group">
+                <div className="hospital-donation-field">
                   <label htmlFor="donation_date">
-                    Donation Date
+                    Donation date &amp; time
                   </label>
 
                   <input
                     id="donation_date"
                     name="donation_date"
                     type="datetime-local"
-                    value={
-                      donationForm.donation_date
-                    }
-                    onChange={
-                      handleDonationFormChange
-                    }
+                    value={donationForm.donation_date}
+                    onChange={handleDonationFormChange}
                     required
                   />
                 </div>
               </div>
 
-              <div className="hospital-form-group">
+              <div className="hospital-donation-field hospital-donation-notes-field">
                 <label htmlFor="donation_notes">
-                  Notes
+                  Notes <span>(optional)</span>
                 </label>
 
                 <textarea
@@ -1440,14 +1457,17 @@ export default function RequestDetails() {
                   name="notes"
                   rows="4"
                   value={donationForm.notes}
-                  onChange={
-                    handleDonationFormChange
-                  }
-                  placeholder="Optional donation notes"
+                  onChange={handleDonationFormChange}
+                  placeholder="Add any relevant donation notes..."
                 />
+
+                <span className="hospital-donation-field-help">
+                  Optional information for the hospital's donation record.
+                </span>
               </div>
 
-              <div className="hospital-page-actions">
+              {/* Footer */}
+              <div className="hospital-donation-modal-footer">
                 <button
                   type="button"
                   className="hospital-secondary-button"
