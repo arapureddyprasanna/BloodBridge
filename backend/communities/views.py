@@ -1220,6 +1220,7 @@ class DonorOnboardingStatusView(APIView):
             donor.account_status == User.AccountStatus.ACTIVE
             and donor.is_active
             and accepted_application is not None
+            and required_documents_submitted
             and required_documents_verified
         )
 

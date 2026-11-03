@@ -24,10 +24,21 @@ export default function DonorRoute({
 
   useEffect(() => {
     let mounted = true;
+    let requestId = 0;
 
     const checkDonorAccess = async (firebaseUser) => {
+      const currentRequestId = ++requestId;
+      const isCurrentRequest = () =>
+        mounted && currentRequestId === requestId;
+
+      setState((currentState) => ({
+        ...currentState,
+        loading: true,
+        authError: null,
+      }));
+
       if (!firebaseUser) {
-        if (mounted) {
+        if (isCurrentRequest()) {
           setState({
             loading: false,
             authorized: false,
@@ -55,7 +66,7 @@ export default function DonorRoute({
           passwordUser &&
           firebaseUser.emailVerified !== true
         ) {
-          if (mounted) {
+          if (isCurrentRequest()) {
             setState({
               loading: false,
               authorized: false,
@@ -72,6 +83,7 @@ export default function DonorRoute({
         const response = await fetch(
           `${API_BASE_URL}/auth/me/`,
           {
+            cache: "no-store",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -90,7 +102,7 @@ export default function DonorRoute({
           );
         }
 
-        if (!mounted) return;
+        if (!isCurrentRequest()) return;
 
         const isDonor = profile.role === "donor";
 
@@ -135,6 +147,7 @@ export default function DonorRoute({
           const onboardingResponse = await fetch(
             `${API_BASE_URL}/communities/onboarding/status/`,
             {
+              cache: "no-store",
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -158,7 +171,7 @@ export default function DonorRoute({
             );
           }
 
-          if (!mounted) return;
+          if (!isCurrentRequest()) return;
 
           const nextStep =
             onboardingData.next_step || null;
@@ -193,6 +206,7 @@ export default function DonorRoute({
         const onboardingResponse = await fetch(
           `${API_BASE_URL}/communities/onboarding/status/`,
           {
+            cache: "no-store",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -212,7 +226,7 @@ export default function DonorRoute({
           );
         }
 
-        if (!mounted) return;
+        if (!isCurrentRequest()) return;
 
         setState({
           loading: false,
@@ -230,7 +244,7 @@ export default function DonorRoute({
           error
         );
 
-        if (!mounted) return;
+        if (!isCurrentRequest()) return;
 
         /*
          * A Firebase token-refresh failure is NOT a role failure.
@@ -258,13 +272,34 @@ export default function DonorRoute({
       }
     );
 
+    const refreshVisibleDonorAccess = () => {
+      if (document.visibilityState === "visible") {
+        checkDonorAccess(auth.currentUser);
+      }
+    };
+
+    window.addEventListener(
+      "focus",
+      refreshVisibleDonorAccess
+    );
+    document.addEventListener(
+      "visibilitychange",
+      refreshVisibleDonorAccess
+    );
+
     return () => {
       mounted = false;
+      window.removeEventListener(
+        "focus",
+        refreshVisibleDonorAccess
+      );
+      document.removeEventListener(
+        "visibilitychange",
+        refreshVisibleDonorAccess
+      );
       unsubscribe();
     };
-  }, [
-    requireOnboarding,
-  ]);
+  }, [requireOnboarding, location.pathname]);
 
   useEffect(() => {
     if (

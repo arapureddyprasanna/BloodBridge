@@ -166,3 +166,40 @@ class DonorOnboardingStatusTests(FirebaseAPITestCase):
         self.assertEqual(response.data["next_step"], "dashboard")
         self.assertTrue(response.data["dashboard_access"])
         self.assertTrue(response.data["required_documents_verified"])
+
+    def test_fully_approved_donor_gets_dashboard(self):
+        self.create_community_application(
+            DonorCommunityApplication.Status.ACCEPTED,
+        )
+        verification = self.add_required_documents(
+            VerificationDocument.Status.VERIFIED,
+        )
+        verification.status = VerificationApplication.Status.APPROVED
+        verification.save(update_fields=["status"])
+        self.donor.account_status = User.AccountStatus.ACTIVE
+        self.donor.save(update_fields=["account_status"])
+
+        response = self.get_onboarding_status()
+
+        self.assertEqual(response.data["next_step"], "dashboard")
+        self.assertTrue(response.data["dashboard_access"])
+        self.assertTrue(response.data["required_documents_verified"])
+
+    def test_approved_verification_without_required_documents_denies_dashboard(
+        self,
+    ):
+        self.create_community_application(
+            DonorCommunityApplication.Status.ACCEPTED,
+        )
+        verification = self.donor.verification_application
+        verification.status = VerificationApplication.Status.APPROVED
+        verification.save(update_fields=["status"])
+        self.donor.account_status = User.AccountStatus.ACTIVE
+        self.donor.save(update_fields=["account_status"])
+
+        response = self.get_onboarding_status()
+
+        self.assertEqual(response.data["next_step"], "pending")
+        self.assertFalse(response.data["required_documents_uploaded"])
+        self.assertFalse(response.data["required_documents_verified"])
+        self.assertFalse(response.data["dashboard_access"])
