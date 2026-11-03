@@ -155,6 +155,7 @@ function DocumentStatus({ status }) {
 function DocumentRow({
   document,
   onOpen,
+  onDownload,
   onVerify,
   onReject,
   processingDocumentId,
@@ -201,7 +202,17 @@ function DocumentRow({
             disabled={isProcessing}
             title="Open document"
           >
-            ↗
+            View
+          </button>
+
+          <button
+            type="button"
+            className="hv-document-action"
+            onClick={() => onDownload(document)}
+            disabled={isProcessing}
+            title="Download document"
+          >
+            Download
           </button>
 
           {status !== "verified" && (
@@ -677,6 +688,13 @@ export default function HospitalVerification() {
   const openDocument = async (document) => {
     if (!document?.id) return;
 
+    const documentTab = window.open("about:blank", "_blank");
+    if (!documentTab) {
+      showToast("Allow pop-ups to view this document.", "error");
+      return;
+    }
+    documentTab.opener = null;
+
     try {
       const token = await getToken();
 
@@ -700,15 +718,53 @@ export default function HospitalVerification() {
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
-      window.open(url, "_blank", "noopener,noreferrer");
+      documentTab.location.href = url;
 
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
       }, 60000);
     } catch (err) {
+      documentTab.close();
       showToast(
         err?.message ||
           "Unable to open the document.",
+        "error"
+      );
+    }
+  };
+
+  const downloadDocument = async (document) => {
+    if (!document?.id) return;
+
+    try {
+      const token = await getToken();
+      const response = await fetch(
+        `${API_BASE_URL}/superadmin/verification/documents/${document.id}/download/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(
+          data.detail || "Unable to download this document."
+        );
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const anchor = window.document.createElement("a");
+      anchor.href = url;
+      anchor.download =
+        document.name || `${document.document_type || "verification-document"}`;
+      anchor.click();
+      window.setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    } catch (err) {
+      showToast(
+        err?.message || "Unable to download this document.",
         "error"
       );
     }
@@ -1273,6 +1329,7 @@ export default function HospitalVerification() {
                         key={document.document_type}
                         document={document}
                         onOpen={openDocument}
+                        onDownload={downloadDocument}
                         onVerify={() =>
                           setConfirmation({
                             type: "document",

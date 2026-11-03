@@ -37,6 +37,39 @@ function Loading({ label = "Loading community data…" }) { return <div classNam
 function Empty({ title, children }) { return <div className="bb-community-empty"><span aria-hidden="true">♧</span><h3>{title}</h3><p>{children}</p></div>; }
 function toLocalDateTimeInput(value) { const date = new Date(value); if (Number.isNaN(date.getTime())) return ""; const pad = (part) => String(part).padStart(2, "0"); return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`; }
 
+async function viewCommunityDocument(application, doc) {
+  const documentTab = window.open("about:blank", "_blank");
+  if (!documentTab) {
+    showToast("Allow pop-ups to view this document.", "error");
+    return;
+  }
+  documentTab.opener = null;
+
+  try {
+    const blob = await api(`/communities/my/applications/${application.id}/documents/${doc.id}/download/`);
+    const objectUrl = URL.createObjectURL(blob);
+    documentTab.location.href = objectUrl;
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+  } catch (err) {
+    documentTab.close();
+    showToast(err.message, "error");
+  }
+}
+
+async function downloadCommunityDocument(application, doc) {
+  try {
+    const blob = await api(`/communities/my/applications/${application.id}/documents/${doc.id}/download/`);
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = `${doc.type}-document`;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
 function useCommunityData() {
   const [community, setCommunity] = useState(null);
   const [applications, setApplications] = useState([]);
@@ -105,7 +138,7 @@ function ApplicationCard({ application, onChanged, detail = false }) {
   return <article className="bb-community-application-card"><div className="bb-community-applicant"><div className="bb-community-person-mark">{(application.donor_name || "D").split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase()}</div><div className="bb-community-person-info"><h3>{application.donor_name || "Donor"}</h3><p>{application.donor_email || "Email not provided"}</p><p>{application.donor_phone || "Phone not provided"}</p></div><StatusBadge status={application.status} /></div>
     <div className="bb-community-applicant-meta"><span><strong>Blood group</strong>{application.blood_group || "Not provided"}</span><span><strong>Applied</strong>{formatDate(application.submitted_at)}</span><span><strong>Verification</strong>{String(application.verification_status || "not started").replaceAll("_", " ")}</span></div>
     {application.rejection_reason && <p className="bb-community-rejection-note">Previous decision: {application.rejection_reason}</p>}
-    <div className="bb-community-documents"><h4>Required donor documents</h4>{documents.map((doc) => <div className="bb-community-document" key={doc.id || doc.type}><div className="bb-community-document-info"><strong>{doc.label}</strong><span>{doc.uploaded ? <StatusBadge status={doc.status} /> : <span className="bb-community-missing">Not uploaded</span>}</span>{doc.rejection_reason && <small>{doc.rejection_reason}</small>}</div><div className="bb-community-document-actions">{doc.uploaded && doc.id && <button className="bb-community-button bb-community-button--light" type="button" onClick={async () => { try { const blob = await api(`/communities/my/applications/${application.id}/documents/${doc.id}/download/`); const objectUrl = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = objectUrl; anchor.download = `${doc.type}-document`; anchor.click(); URL.revokeObjectURL(objectUrl); } catch (err) { showToast(err.message, "error"); } }}>Download document</button>}{application.status === "pending" && doc.uploaded && doc.id && <><button className="bb-community-button bb-community-button--light" type="button" disabled={busy || doc.status === "verified"} onClick={() => updateDocument(doc, "verified")}>Verify</button><button className="bb-community-button bb-community-button--danger" type="button" disabled={busy} onClick={() => updateDocument(doc, "rejected")}>Reject document</button></>}</div></div>)}</div>
+    <div className="bb-community-documents"><h4>Required donor documents</h4>{documents.map((doc) => <div className="bb-community-document" key={doc.id || doc.type}><div className="bb-community-document-info"><strong>{doc.label}</strong><span>{doc.uploaded ? <StatusBadge status={doc.status} /> : <span className="bb-community-missing">Not uploaded</span>}</span>{doc.rejection_reason && <small>{doc.rejection_reason}</small>}</div><div className="bb-community-document-actions">{doc.uploaded && doc.id && <><button className="bb-community-button bb-community-button--light" type="button" onClick={() => viewCommunityDocument(application, doc)}>View</button><button className="bb-community-button bb-community-button--light" type="button" onClick={() => downloadCommunityDocument(application, doc)}>Download document</button></>}{application.status === "pending" && doc.uploaded && doc.id && <><button className="bb-community-button bb-community-button--light" type="button" disabled={busy || doc.status === "verified"} onClick={() => updateDocument(doc, "verified")}>Verify</button><button className="bb-community-button bb-community-button--danger" type="button" disabled={busy} onClick={() => updateDocument(doc, "rejected")}>Reject document</button></>}</div></div>)}</div>
     {application.status === "pending" && <div className="bb-community-card-actions">{rejecting ? <div className="bb-community-reject-form"><label htmlFor={`reason-${application.id}`}>Reason for rejecting membership</label><textarea id={`reason-${application.id}`} rows="2" value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Explain what the donor should address" /><button className="bb-community-button bb-community-button--danger" type="button" disabled={busy || !reason.trim()} onClick={reject}>Confirm rejection</button><button className="bb-community-button bb-community-button--light" type="button" onClick={() => setRejecting(false)}>Cancel</button></div> : <><button className="bb-community-button bb-community-button--primary" type="button" disabled={busy || !allVerified} title={!allVerified ? "Verify all required documents before approving" : ""} onClick={approve}>{busy ? "Saving…" : "Approve membership"}</button><button className="bb-community-button bb-community-button--danger" type="button" disabled={busy} onClick={() => setRejecting(true)}>Reject membership</button></>}</div>}
   </article>;
 }

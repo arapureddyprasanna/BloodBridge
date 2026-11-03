@@ -118,7 +118,8 @@ function DocumentRow({
   document,
   onVerify,
   onReject,
-  onDownload,
+  onView,
+  onSave,
   processingDocumentId,
 }) {
   const isProcessing = processingDocumentId === document.id;
@@ -163,11 +164,21 @@ function DocumentRow({
         <button
           type="button"
           className="hv-document-action"
-          onClick={() => onDownload(document)}
+          onClick={() => onView(document)}
           disabled={isProcessing}
           title="Open document"
         >
           View
+        </button>
+
+        <button
+          type="button"
+          className="hv-document-action"
+          onClick={() => onSave(document)}
+          disabled={isProcessing}
+          title="Download document"
+        >
+          Download
         </button>
 
         {document.status === "pending" && (
@@ -631,6 +642,13 @@ export default function CommunityVerification() {
   const handleDownload = async (document) => {
     if (!document?.id) return;
 
+    const documentTab = window.open("about:blank", "_blank");
+    if (!documentTab) {
+      showToast("Allow pop-ups to view this document.", "error");
+      return;
+    }
+    documentTab.opener = null;
+
     try {
       const token = await getToken();
 
@@ -654,14 +672,52 @@ export default function CommunityVerification() {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
-      window.open(url, "_blank", "noopener,noreferrer");
+      documentTab.location.href = url;
 
       setTimeout(() => {
         URL.revokeObjectURL(url);
       }, 60000);
     } catch (err) {
+      documentTab.close();
       showToast(
         err.message || "Unable to open the document.",
+        "error"
+      );
+    }
+  };
+
+  const handleSaveDocument = async (document) => {
+    if (!document?.id) return;
+
+    try {
+      const token = await getToken();
+      const response = await fetch(
+        `${API_BASE_URL}/superadmin/verification/documents/${document.id}/download/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(
+          data.detail || "Unable to download this document."
+        );
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = window.document.createElement("a");
+      anchor.href = url;
+      anchor.download =
+        document.name || `${document.document_type || "verification-document"}`;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (err) {
+      showToast(
+        err.message || "Unable to download this document.",
         "error"
       );
     }
@@ -1214,7 +1270,8 @@ export default function CommunityVerification() {
                         onReject={(doc) =>
                           handleDocumentDecision(doc, "reject")
                         }
-                        onDownload={handleDownload}
+                        onView={handleDownload}
+                        onSave={handleSaveDocument}
                         processingDocumentId={
                           processingDocumentId
                         }
