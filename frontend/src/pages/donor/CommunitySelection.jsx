@@ -194,10 +194,9 @@ export default function CommunitySelection() {
       }
 
       /*
-       * Community selection is now complete.
-       * The next onboarding step is donor document verification.
+       * Let DonorRoute resolve the next step from onboarding status.
        */
-      navigate("/verification/documents", {
+      navigate("/donor/onboarding/review", {
         replace: true,
         state: {
           onboarding: true,

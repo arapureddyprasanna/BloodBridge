@@ -16,14 +16,11 @@ export default function DonorRoute({
     authorized: false,
     status: null,
     onboardingStep: null,
+    dashboardAccess: false,
     authError: null,
   });
 
   const [toastShown, setToastShown] = useState(false);
-
-  const isReplacingRejectedDocument =
-    location.pathname === "/verification/documents" &&
-    location.state?.replaceRejected === true;
 
   useEffect(() => {
     let mounted = true;
@@ -171,6 +168,8 @@ export default function DonorRoute({
             authorized: true,
             status: effectiveStatus,
             onboardingStep: nextStep,
+            dashboardAccess:
+              onboardingData.dashboard_access === true,
             authError: null,
           });
 
@@ -221,6 +220,8 @@ export default function DonorRoute({
           status: effectiveStatus,
           onboardingStep:
             onboardingData.next_step || null,
+          dashboardAccess:
+            onboardingData.dashboard_access === true,
           authError: null,
         });
       } catch (error) {
@@ -263,7 +264,27 @@ export default function DonorRoute({
     };
   }, [
     requireOnboarding,
-    isReplacingRejectedDocument,
+  ]);
+
+  useEffect(() => {
+    if (
+      requireOnboarding &&
+      state.authorized &&
+      state.onboardingStep === "community_selection" &&
+      location.pathname !== "/donor/onboarding/community" &&
+      !toastShown
+    ) {
+      toast.error(
+        "Please complete the community selection step first."
+      );
+      setToastShown(true);
+    }
+  }, [
+    requireOnboarding,
+    state.authorized,
+    state.onboardingStep,
+    location.pathname,
+    toastShown,
   ]);
 
   if (state.loading) {
@@ -335,98 +356,52 @@ export default function DonorRoute({
   }
 
   if (
-    requireOnboarding &&
-    !isReplacingRejectedDocument
+    requireOnboarding
   ) {
-    if (
-      state.onboardingStep ===
-      "community_selection"
-    ) {
-      if (
-        location.pathname !==
-        "/donor/onboarding/community"
-      ) {
-        if (!toastShown) {
-          toast.error(
-            "Please complete the community selection step first."
-          );
-          setToastShown(true);
-        }
+    let onboardingPath = null;
 
-        return (
-          <Navigate
-            to="/donor/onboarding/community"
-            replace
-            state={{ from: location }}
-          />
-        );
-      }
+    if (state.dashboardAccess) {
+      onboardingPath = "/donor/dashboard";
+    } else {
+      onboardingPath = {
+        community_selection:
+          "/donor/onboarding/community",
+        community_review:
+          "/donor/onboarding/review",
+        review:
+          "/donor/onboarding/review",
+        pending:
+          "/donor/onboarding/review",
+        documents:
+          "/verification/documents",
+      }[state.onboardingStep] || null;
     }
 
     if (
-      state.onboardingStep === "documents"
+      onboardingPath &&
+      location.pathname !== onboardingPath
     ) {
-      if (
-        location.pathname !==
-        "/verification/documents"
-      ) {
-        return (
-          <Navigate
-            to="/verification/documents"
-            replace
-            state={{ from: location }}
-          />
-        );
-      }
-    }
-
-    if (
-      state.onboardingStep ===
-      "community_review"
-    ) {
-      if (
-        location.pathname !==
-        "/donor/onboarding/review"
-      ) {
-        return (
-          <Navigate
-            to="/donor/onboarding/review"
-            replace
-            state={{ from: location }}
-          />
-        );
-      }
-    }
-
-    if (
-      state.onboardingStep === "dashboard"
-    ) {
-      if (
-        location.pathname !==
-        "/donor/dashboard"
-      ) {
-        return (
-          <Navigate
-            to="/donor/dashboard"
-            replace
-            state={{ from: location }}
-          />
-        );
-      }
+      return (
+        <Navigate
+          to={onboardingPath}
+          replace
+          state={{ from: location }}
+        />
+      );
     }
   }
 
-  if (
-    !requireOnboarding &&
-    state.onboardingStep &&
-    state.onboardingStep !== "dashboard"
-  ) {
+  if (!requireOnboarding && !state.dashboardAccess) {
     const onboardingPath = {
       community_selection:
         "/donor/onboarding/community",
       documents:
         "/verification/documents",
       community_review:
+        "/donor/onboarding/review",
+      review:
+        "/donor/onboarding/review",
+      pending:
         "/donor/onboarding/review",
     }[state.onboardingStep];
 
@@ -439,6 +414,12 @@ export default function DonorRoute({
         />
       );
     }
+
+    return (
+      <div className="bb-route-loading">
+        Unable to determine your onboarding status. Please try again.
+      </div>
+    );
   }
 
   return children;

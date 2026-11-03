@@ -179,8 +179,8 @@ function Login() {
        *
        * Do NOT call /auth/verification/ for donors.
        *
-       * The backend's next_step is the single source
-       * of truth for donor onboarding.
+       * DonorRoute is the single routing authority. Enter its
+       * community route and let it resolve the current backend state.
        */
       if (role === "donor") {
         const onboardingResponse = await fetch(
@@ -207,36 +207,6 @@ function Login() {
         }
 
         /*
-         * ===================================================
-         * DONOR ONBOARDING STATE MACHINE
-         * ===================================================
-         *
-         * next_step determines the correct destination.
-         */
-        const donorRoutes = {
-          community_selection:
-            "/donor/onboarding/community",
-
-          documents:
-            "/verification/documents",
-
-          community_review:
-            "/donor/onboarding/review",
-
-          dashboard:
-            "/donor/dashboard",
-        };
-
-        console.log(
-          "DONOR ONBOARDING RESPONSE:",
-          onboardingData
-        );
-
-        const destination =
-          donorRoutes[onboardingData.next_step] ||
-          "/donor/onboarding/community";
-
-        /*
          * Only show a successful sign-in toast once.
          */
         showToast(
@@ -244,7 +214,7 @@ function Login() {
           "success"
         );
 
-        navigate(destination, {
+        navigate("/donor/onboarding/community", {
           replace: true,
         });
 

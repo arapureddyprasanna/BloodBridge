@@ -45,76 +45,6 @@ function VerificationDocuments() {
         return user.getIdToken();
     }, [navigate]);
 
-    const getDonorOnboardingStatus = useCallback(
-        async (token) => {
-            const response = await fetch(
-                `${API_BASE_URL}/communities/onboarding/status/`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            const data =
-                await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(
-                    data.detail ||
-                    "Unable to check donor onboarding status."
-                );
-            }
-
-            return data;
-        },
-        []
-    );
-
-    const redirectDonorAccordingToOnboarding = useCallback(
-        (onboardingData) => {
-            const nextStep =
-                onboardingData?.next_step || null;
-
-            switch (nextStep) {
-                case "community_selection":
-                    navigate(
-                        "/donor/onboarding/community",
-                        { replace: true }
-                    );
-                    return true;
-
-                case "community_review":
-                    navigate(
-                        "/donor/onboarding/review",
-                        { replace: true }
-                    );
-                    return true;
-
-                case "dashboard":
-                    navigate(
-                        "/donor/dashboard",
-                        { replace: true }
-                    );
-                    return true;
-
-                case "documents":
-                    /*
-                     * This is the important case.
-                     *
-                     * The donor is supposed to be on this page,
-                     * so DO NOT navigate anywhere.
-                     */
-                    return false;
-
-                default:
-                    return false;
-            }
-        },
-        [navigate]
-    );
-
     const loadVerification = useCallback(async () => {
         try {
             setLoading(true);
@@ -157,46 +87,10 @@ function VerificationDocuments() {
             setVerification(currentVerification);
 
             /*
-             * DONOR-SPECIFIC ROUTING
-             *
-             * Verification application status alone must NOT
-             * decide whether a donor can enter the dashboard.
-             *
-             * The donor onboarding state is authoritative:
-             *
-             * community_selection
-             * community_review
-             * documents
-             * dashboard
+             * DonorRoute owns donor onboarding routing. Verification
+             * status here is used only to load the document workflow.
              */
             if (currentRole === "donor") {
-                const onboardingData =
-                    await getDonorOnboardingStatus(token);
-
-                const redirected =
-                    redirectDonorAccordingToOnboarding(
-                        onboardingData
-                    );
-
-                if (redirected) {
-                    return;
-                }
-
-                /*
-                 * next_step === "documents"
-                 *
-                 * Stay on this page.
-                 *
-                 * This prevents:
-                 *
-                 * /verification/documents
-                 *       ↓
-                 * /donor
-                 *       ↓
-                 * /verification/documents
-                 *
-                 * loop.
-                 */
                 return;
             }
 
@@ -265,9 +159,7 @@ function VerificationDocuments() {
         }
     }, [
         getToken,
-        getDonorOnboardingStatus,
         navigate,
-        redirectDonorAccordingToOnboarding,
     ]);
 
     useEffect(() => {

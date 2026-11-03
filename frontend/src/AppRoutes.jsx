@@ -101,7 +101,9 @@ function AppRoutes() {
           path="/verification/documents"
           element={
             <ProtectedRoute>
-              <VerificationDocuments />
+              <DonorRoute requireOnboarding>
+                <VerificationDocuments />
+              </DonorRoute>
             </ProtectedRoute>
           }
         />
@@ -123,9 +125,9 @@ function AppRoutes() {
                 ↓
               Community Selection
                 ↓
-              Documents
-                ↓
               Community Review
+                ↓
+              Documents
                 ↓
               Dashboard
 
@@ -138,7 +140,9 @@ function AppRoutes() {
           path="/donor/onboarding/community"
           element={
             <ProtectedRoute>
-              <CommunitySelection />
+              <DonorRoute requireOnboarding>
+                <CommunitySelection />
+              </DonorRoute>
             </ProtectedRoute>
           }
         />

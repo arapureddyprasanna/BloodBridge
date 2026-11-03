@@ -83,7 +83,8 @@ function PendingVerification() {
    * LOAD VERIFICATION STATUS
    * ---------------------------------------------------------
    *
-   * Application state controls navigation.
+   * Non-donor application state controls navigation. Donor routing
+   * is controlled by DonorRoute and onboarding status.
    *
    * submitted / under_review
    *      -> stay on this page
@@ -91,10 +92,10 @@ function PendingVerification() {
    * approved + active
    *      -> role dashboard
    *
-   * rejected application
+   * rejected non-donor application
    *      -> documents page
    *
-   * draft and not submitted
+   * non-donor draft and not submitted
    *      -> documents page
    *
    * Individual document rejection
@@ -250,6 +251,10 @@ function PendingVerification() {
          */
 
         if (currentStatus === "rejected") {
+          if (currentRole === "donor") {
+            return;
+          }
+
           if (!navigationHandled.current) {
             navigationHandled.current = true;
 
@@ -280,6 +285,10 @@ function PendingVerification() {
           currentStatus === "draft" &&
           !currentVerification.submitted_at
         ) {
+          if (currentRole === "donor") {
+            return;
+          }
+
           if (!navigationHandled.current) {
             navigationHandled.current = true;
 
